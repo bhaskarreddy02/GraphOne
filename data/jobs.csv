@@ -1,0 +1,116 @@
+schemaVersion,recordType,source.name,job_url,title,content.company,content.date,content.is_remote,content.role_family,location,collectedAt
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150012-his-sales-strategy-executive-ambulatory-care-revenue-cycle,HIS Sales Strategy Executive – Ambulatory Care Revenue Cycle,Tech,2026-09-10T05:30:08+00:00,True,Engineering,,2026-09-10T15:31:42.585167+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/151935-ai-engineer-fde-forward-deployed-engineer-2,AI Engineer – FDE (Forward Deployed Engineer),Tech,2026-09-10T05:10:07+00:00,True,AI / Machine Learning,,2026-09-10T15:31:42.585260+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/149016-independent-contractor-osha-general-industry-consultant,Independent Contractor – OSHA General Industry Consultant,Tech,2026-09-10T04:35:23+00:00,True,Engineering,,2026-09-10T15:31:42.585346+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/149013-junior-program-control-analyst,Junior Program Control Analyst,Tech,2026-09-10T04:35:21+00:00,True,Engineering,,2026-09-10T15:31:42.585421+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/149010-medical-health-physicist,Medical Health Physicist,Tech,2026-09-10T04:35:20+00:00,True,Engineering,,2026-09-10T15:31:42.585493+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/149008-chief-information-security-officer,Chief Information Security Officer,Tech,2026-09-10T04:35:19+00:00,True,Engineering,,2026-09-10T15:31:42.585583+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/149007-procurement-analyst,Procurement Analyst,Tech,2026-09-10T04:35:17+00:00,True,Engineering,,2026-09-10T15:31:42.585653+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/149033-strategic-customer-success-manager-martech-adtech-us,"Strategic Customer Success Manager – MarTech / AdTech, US",Tech,2026-09-10T04:35:11+00:00,True,Engineering,,2026-09-10T15:31:42.585727+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/145652-senior-product-manager-smart-metering-steering-m-f-d,(Senior) Product Manager Smart Metering & Steering (m/f/d),Tech,2026-09-10T04:35:10+00:00,True,Product Management,,2026-09-10T15:31:42.585799+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/145581-enterprise-account-executive-6,Enterprise Account Executive,Tech,2026-09-10T04:35:08+00:00,True,Engineering,,2026-09-10T15:31:42.585867+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/149035-customer-solutions-architect-amazon-connect,"Customer Solutions Architect, Amazon Connect",Tech,2026-09-10T04:35:07+00:00,True,Engineering,,2026-09-10T15:31:42.585935+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/149032-senior-customer-success-manager-public-sector,Senior Customer Success Manager- Public Sector,Tech,2026-09-10T04:35:06+00:00,True,Engineering,,2026-09-10T15:31:42.586039+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/149031-customer-support-systems-analytics-lead,Customer Support Systems & Analytics Lead,Tech,2026-09-10T04:35:04+00:00,True,Engineering,,2026-09-10T15:31:42.586110+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150358-partner-sales-executive-anz-channel,"Partner Sales Executive, ANZ Channel",Tech,2026-09-10T04:30:31+00:00,True,Engineering,,2026-09-10T15:31:42.586277+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150400-commercial-sales-engineer-central,Commercial Sales Engineer – Central,Tech,2026-09-10T04:30:29+00:00,True,Engineering,,2026-09-10T15:31:42.586363+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/145745-it-associate,IT Associate,Tech,2026-09-10T04:30:28+00:00,True,Engineering,,2026-09-10T15:31:42.586434+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/145744-frontend-engineer-react-and-aws,Frontend Engineer React and AWS,Tech,2026-09-10T04:30:27+00:00,True,Engineering,,2026-09-10T15:31:42.586500+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150398-enterprise-sales-vp-public-sector,"Enterprise Sales VP, Public Sector",Tech,2026-09-10T04:30:25+00:00,True,Engineering,,2026-09-10T15:31:42.586568+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150387-mobility-specialist-apac,Mobility Specialist – APAC,Tech,2026-09-10T04:30:24+00:00,True,Engineering,,2026-09-10T15:31:42.586641+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150385-legal-consultant-ma,Legal Consultant – M&A,Tech,2026-09-10T04:30:23+00:00,True,Engineering,,2026-09-10T15:31:42.586713+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150404-senior-sales-engineer-majors-florida,"Senior Sales Engineer – Majors, Florida",Tech,2026-09-10T04:30:21+00:00,True,Engineering,,2026-09-10T15:31:42.586780+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150403-senior-sales-engineer-majors-georgia,"Senior Sales Engineer – Majors, Georgia",Tech,2026-09-10T04:30:20+00:00,True,Engineering,,2026-09-10T15:31:42.586856+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150343-customer-success-engineer,Customer Success Engineer,Tech,2026-09-10T04:30:19+00:00,True,Engineering,,2026-09-10T15:31:42.586922+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150353-legal-consultant-commercial-contract-fortune-500,"Legal Consultant – Commercial Contract, Fortune 500",Tech,2026-09-10T04:30:17+00:00,True,Engineering,,2026-09-10T15:31:42.586992+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150401-senior-sales-engineer-majors-tola,"Senior Sales Engineer – Majors, TOLA",Tech,2026-09-10T04:30:16+00:00,True,Engineering,,2026-09-10T15:31:42.587058+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150354-legal-consultant-payments-regulatory,"Legal Consultant, Payments Regulatory",Tech,2026-09-10T04:30:15+00:00,True,Engineering,,2026-09-10T15:31:42.587125+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150355-senior-account-manager-emea,Senior Account Manager – EMEA,Tech,2026-09-10T04:30:14+00:00,True,Engineering,,2026-09-10T15:31:42.587195+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150397-enterprise-sales-vp-labor-and-trust,"Enterprise Sales VP, Labor and Trust",Tech,2026-09-10T04:30:12+00:00,True,Engineering,,2026-09-10T15:31:42.587265+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150357-talent-acquisition-strategist,Talent Acquisition Strategist,Tech,2026-09-10T04:30:11+00:00,True,Design,,2026-09-10T15:31:42.587337+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150356-senior-manager-sales-account-management,"Senior Manager, Sales – Account Management",Tech,2026-09-10T04:30:09+00:00,True,Engineering,,2026-09-10T15:31:42.587413+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150382-regional-account-manager,Regional Account Manager,Tech,2026-09-10T04:30:08+00:00,True,Engineering,,2026-09-10T15:31:42.587481+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150352-senior-pre-sales-engineer-singapore,Senior Pre-Sales Engineer (Singapore),Tech,2026-09-10T04:30:06+00:00,True,Engineering,,2026-09-10T15:31:42.587546+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150389-part-time-court-researcher-hardin-county-ky,"Part Time Court Researcher – Hardin County, KY",Tech,2026-09-10T04:25:38+00:00,True,Engineering,,2026-09-10T15:31:42.587617+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150381-software-architect,Software Architect,Tech,2026-09-10T04:25:36+00:00,True,Engineering,,2026-09-10T15:31:42.587691+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150371-graduate-hr-generalist-apac,Graduate HR Generalist – APAC,Tech,2026-09-10T04:25:35+00:00,True,Engineering,,2026-09-10T15:31:42.587761+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150366-senior-full-stack-software-engineer,Senior Full-Stack Software Engineer,Tech,2026-09-10T04:25:34+00:00,True,Engineering,,2026-09-10T15:31:42.587825+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150365-go-golang-software-engineer-developer-tooling-and-containers,"Go (Golang) Software Engineer, Developer Tooling and Containers",Tech,2026-09-10T04:25:32+00:00,True,AI / Machine Learning,,2026-09-10T15:31:42.587888+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150394-dialer-us-sales-team,Dialer (US Sales Team),Tech,2026-09-10T04:25:31+00:00,True,Engineering,,2026-09-10T15:31:42.587959+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150379-legal-consultant-negotiator-umr-derivatives,Legal Consultant / Negotiator – UMR (Derivatives),Tech,2026-09-10T04:25:29+00:00,True,Engineering,,2026-09-10T15:31:42.588049+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150376-work-from-home-as-a-private-online-german-tutor-for-ukrainians-part-time,Work from home as a Private Online German Tutor for Ukrainians – Part Time,Tech,2026-09-10T04:25:28+00:00,True,AI / Machine Learning,,2026-09-10T15:31:42.588121+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150360-open-source-networking-software-engineer-tor-switch-smartnic-dpu,Open Source Networking Software Engineer – ToR Switch / SmartNIC / DPU,Tech,2026-09-10T04:25:27+00:00,True,Engineering,,2026-09-10T15:31:42.588190+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150359-customer-success-manager-12,Customer Success Manager,Tech,2026-09-10T04:25:25+00:00,True,Engineering,,2026-09-10T15:31:42.588256+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150329-senior-customer-engineer-shenzhen,"Senior Customer Engineer, Shenzhen",Tech,2026-09-10T04:25:24+00:00,True,Engineering,,2026-09-10T15:31:42.588319+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150367-partner-sales-manager-dell,Partner Sales Manager – Dell,Tech,2026-09-10T04:25:23+00:00,True,Engineering,,2026-09-10T15:31:42.588392+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150368-regional-hr-manager-emea,Regional HR Manager – EMEA,Tech,2026-09-10T04:25:21+00:00,True,Engineering,,2026-09-10T15:31:42.588465+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150363-partner-sales-manager-hewlett-packard-enterprise-india,"Partner Sales Manager – Hewlett Packard Enterprise, India",Tech,2026-09-10T04:25:20+00:00,True,Engineering,,2026-09-10T15:31:42.588539+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150364-software-engineer-python-container-images,Software Engineer – Python – Container Images,Tech,2026-09-10T04:25:18+00:00,True,AI / Machine Learning,,2026-09-10T15:31:42.588603+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150369-junior-project-manager,Junior Project Manager,Tech,2026-09-10T04:25:17+00:00,True,Engineering,,2026-09-10T15:31:42.588669+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150373-project-manager-ubuntu-embedded-systems,Project Manager – Ubuntu Embedded Systems,Tech,2026-09-10T04:25:16+00:00,True,Engineering,,2026-09-10T15:31:42.588741+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150361-embedded-linux-consultant-japan,Embedded Linux Consultant – Japan,Tech,2026-09-10T04:25:04+00:00,True,Design,,2026-09-10T15:31:42.588809+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150362-senior-sales-engineer-enterprise,"Senior Sales Engineer, Enterprise",Tech,2026-09-10T04:25:03+00:00,True,Engineering,,2026-09-10T15:31:42.588873+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/150333-senior-customer-marketing-manager-3,Senior Customer Marketing Manager,Tech,2026-09-10T04:20:11+00:00,True,Engineering,,2026-09-10T15:31:42.588942+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152957-principal-partner-manager-channels-gsi,Principal Partner Manager – Channels (GSI),Tech,2026-09-09T17:30:17+00:00,True,Engineering,,2026-09-10T15:31:42.589015+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152956-president-business-unit,President – Business Unit,Tech,2026-09-09T17:29:54+00:00,True,Engineering,,2026-09-10T15:31:42.589084+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152955-partner-solutions-architect-pan-emea-gsi,Partner Solutions Architect (Pan-EMEA GSI),Tech,2026-09-09T17:29:30+00:00,True,Engineering,,2026-09-10T15:31:42.589151+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152954-marketing-operations-manager,Marketing Operations Manager,Tech,2026-09-09T17:29:05+00:00,True,Engineering,,2026-09-10T15:31:42.589217+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152953-ma-professional,M&A Professional,Tech,2026-09-09T17:28:39+00:00,True,Engineering,,2026-09-10T15:31:42.589283+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152952-senior-accountant-accounting-manager,Senior Accountant / Accounting Manager,Tech,2026-09-09T17:28:16+00:00,True,Engineering,,2026-09-10T15:31:42.589354+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152951-major-account-manager-emea,Major Account Manager (EMEA),Tech,2026-09-09T17:27:55+00:00,True,Engineering,,2026-09-10T15:31:42.589421+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152950-manager-customer-success-3,Manager – Customer Success,Tech,2026-09-09T17:27:34+00:00,True,Engineering,,2026-09-10T15:31:42.589493+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152949-senior-engineer-software-enterprise,"Senior Engineer (Software), Enterprise",Tech,2026-09-09T17:27:13+00:00,True,Engineering,,2026-09-10T15:31:42.589561+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152948-key-accounts-executive-emea,Key Accounts Executive – EMEA,Tech,2026-09-09T17:26:49+00:00,True,Engineering,,2026-09-10T15:31:42.589629+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152947-data-architect,Data Architect,Tech,2026-09-09T17:26:26+00:00,True,Engineering,,2026-09-10T15:31:42.589700+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152946-senior-sales-operations-manager,Senior Sales Operations Manager,Tech,2026-09-09T17:26:02+00:00,True,Engineering,,2026-09-10T15:31:42.589771+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152945-enterprise-security-sales-specialist,Enterprise Security Sales Specialist,Tech,2026-09-09T17:25:42+00:00,True,Engineering,,2026-09-10T15:31:42.589837+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152944-business-systems-analyst-3,Business Systems Analyst,Tech,2026-09-09T17:25:19+00:00,True,Engineering,,2026-09-10T15:31:42.589903+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152943-content-marketing-manager-5,Content Marketing Manager,Tech,2026-09-09T17:24:58+00:00,True,Engineering,,2026-09-10T15:31:42.589969+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152942-visual-designer-web,"Visual Designer, Web",Tech,2026-09-09T17:24:38+00:00,True,Design,,2026-09-10T15:31:42.590052+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152941-enterprise-sales-executive-sled,Enterprise Sales Executive (SLED),Tech,2026-09-09T17:24:14+00:00,True,Engineering,,2026-09-10T15:31:42.590126+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152940-account-executive-industrial-division,Account Executive (Industrial Division),Tech,2026-09-09T17:23:54+00:00,True,AI / Machine Learning,,2026-09-10T15:31:42.590204+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152939-senior-demand-generation-manager-2,Senior Demand Generation Manager,Tech,2026-09-09T17:23:33+00:00,True,Engineering,,2026-09-10T15:31:42.590270+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152938-software-engineer-backend,"Software Engineer, Backend",Tech,2026-09-09T17:23:14+00:00,True,Engineering,,2026-09-10T15:31:42.590332+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152937-enterprise-sales-executive-fed,Enterprise Sales Executive (FED),Tech,2026-09-09T17:22:54+00:00,True,Engineering,,2026-09-10T15:31:42.590398+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152936-account-executive-edtech-division,Account Executive (EdTech Division),Tech,2026-09-09T17:22:33+00:00,True,AI / Machine Learning,,2026-09-10T15:31:42.590460+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152935-senior-platform-engineer-3,Senior Platform Engineer,Tech,2026-09-09T17:22:10+00:00,True,Engineering,,2026-09-10T15:31:42.590524+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152934-account-executive-commerce-compliance-divisions,Account Executive (Commerce & Compliance Divisions),Tech,2026-09-09T17:21:48+00:00,True,AI / Machine Learning,,2026-09-10T15:31:42.590595+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152933-solution-lead,Solution Lead,Tech,2026-09-09T17:21:27+00:00,True,Engineering,,2026-09-10T15:31:42.590668+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152932-staff-backend-engineer-net-f-m-d,Staff Backend Engineer (.NET) (f/m/d),Tech,2026-09-09T17:21:05+00:00,True,Engineering,,2026-09-10T15:31:42.590735+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152931-senior-renewals-manager,Senior Renewals Manager,Tech,2026-09-09T17:20:40+00:00,True,Engineering,,2026-09-10T15:31:42.590800+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152930-business-development-manager-3,Business Development Manager,Tech,2026-09-09T17:20:17+00:00,True,Product Management,,2026-09-10T15:31:42.590865+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152929-security-engineer-cloud,"Security Engineer, Cloud",Tech,2026-09-09T17:19:56+00:00,True,Engineering,,2026-09-10T15:31:42.590928+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152928-senior-product-engineer,Senior Product Engineer,Tech,2026-09-09T17:19:37+00:00,True,Engineering,,2026-09-10T15:31:42.590996+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152927-commercial-account-executive-acquisition-remote-sweden,"Commercial Account Executive, Acquisition | Remote | Sweden",Tech,2026-09-09T16:39:43+00:00,True,Design,,2026-09-10T15:31:42.591071+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152926-implementation-specialist-2,Implementation Specialist,Tech,2026-09-09T16:39:24+00:00,True,Engineering,,2026-09-10T15:31:42.591143+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152925-enterprise-account-executive-goods-services,Enterprise Account Executive – Goods & Services,Tech,2026-09-09T16:39:08+00:00,True,Engineering,,2026-09-10T15:31:42.591215+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152924-staff-ai-product-analyst,Staff AI Product Analyst,Tech,2026-09-09T16:38:50+00:00,True,AI / Machine Learning,,2026-09-10T15:31:42.591276+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152923-commercial-account-executive-acquisition-remote-netherlands,"Commercial Account Executive, Acquisition | Remote | Netherlands",Tech,2026-09-09T16:38:32+00:00,True,Design,,2026-09-10T15:31:42.591343+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152922-sdr-sales-development-representative,SDR (Sales Development Representative),Tech,2026-09-09T16:38:13+00:00,True,Product Management,,2026-09-10T15:31:42.591414+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152921-enterprise-account-executive-fsi,Enterprise Account Executive – FSI,Tech,2026-09-09T16:37:57+00:00,True,Engineering,,2026-09-10T15:31:42.591487+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152920-backend-engineer-platform-stacks-uk-remote,Backend Engineer – Platform – Stacks | UK | Remote,Tech,2026-09-09T16:37:38+00:00,True,Engineering,,2026-09-10T15:31:42.591554+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152919-staff-software-engineer-data,Staff Software Engineer – Data,Tech,2026-09-09T16:37:19+00:00,True,Engineering,,2026-09-10T15:31:42.591624+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152918-enterprise-account-executive-denmark-2,Enterprise Account Executive – Denmark,Tech,2026-09-09T16:36:58+00:00,True,Engineering,,2026-09-10T15:31:42.591696+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152914-lead-product-manager-customer-portal,"Lead Product Manager, Customer Portal",Tech,2026-09-09T16:32:33+00:00,True,Product Management,,2026-09-10T15:31:42.591766+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152913-performance-media-analyst,Performance Media Analyst,Tech,2026-09-09T16:32:14+00:00,True,Engineering,,2026-09-10T15:31:42.591838+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152912-senior-software-engineer-net-f-m-d,Senior Software Engineer (.NET) (f/m/d),Tech,2026-09-09T16:31:55+00:00,True,Engineering,,2026-09-10T15:31:42.591902+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152911-senior-strategist-strategy-lead-contract,Senior Strategist / Strategy Lead (contract),Tech,2026-09-09T16:31:35+00:00,True,Engineering,,2026-09-10T15:31:42.591970+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152910-staff-software-engineer-experimentation-platform,"Staff Software Engineer, Experimentation Platform",Tech,2026-09-09T16:31:15+00:00,True,Engineering,,2026-09-10T15:31:42.592048+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152908-staff-devops-engineer-2,Staff DevOps Engineer,Tech,2026-09-09T16:30:32+00:00,True,Engineering,,2026-09-10T15:31:42.592114+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152907-operations-risk-lead,Operations Risk Lead,Tech,2026-09-09T16:30:08+00:00,True,Engineering,,2026-09-10T15:31:42.592180+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152906-head-of-product-marketing-2,Head of Product Marketing,Tech,2026-09-09T16:29:45+00:00,True,Product Management,,2026-09-10T15:31:42.592254+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152904-gtm-operations-specialist-f-m-d,GTM Operations Specialist (f/m/d,Tech,2026-09-09T16:29:04+00:00,True,Engineering,,2026-09-10T15:31:42.592321+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152903-senior-developer,Senior Developer,Tech,2026-09-09T16:28:42+00:00,True,Engineering,,2026-09-10T15:31:42.592384+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152902-senior-stock-administrator-2,Senior Stock Administrator,Tech,2026-09-09T16:28:22+00:00,True,Engineering,,2026-09-10T15:31:42.592448+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152901-senior-devops-engineer-7,Senior DevOps Engineer,Tech,2026-09-09T16:27:57+00:00,True,Engineering,,2026-09-10T15:31:42.592509+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152900-operations-risk-analyst,Operations Risk Analyst,Tech,2026-09-09T16:27:34+00:00,True,Engineering,,2026-09-10T15:31:42.592578+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152897-business-development-representative-dach-f-m-d-2,Business Development Representative – DACH (f/m/d),Tech,2026-09-09T16:26:32+00:00,True,Product Management,,2026-09-10T15:31:42.592651+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152896-freelance-product-and-brand-designers-join-our-network,Freelance Product and Brand Designers – Join Our Network,Tech,2026-09-09T16:26:10+00:00,True,Product Management,,2026-09-10T15:31:42.592724+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152894-fractional-revops-gtm-engineer-part-time-contract,"Fractional RevOps / GTM Engineer (Part-Time, Contract)",Tech,2026-09-09T16:25:30+00:00,True,Engineering,,2026-09-10T15:31:42.592796+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152893-payroll-manager,Payroll Manager,Tech,2026-09-09T16:25:07+00:00,True,Engineering,,2026-09-10T15:31:42.592861+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152892-mid-market-sales-account-executive,Mid-Market Sales Account Executive,Tech,2026-09-09T16:24:42+00:00,True,Engineering,,2026-09-10T15:31:42.592928+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152891-legal-market-contracts,Legal (Market Contracts),Tech,2026-09-09T16:24:19+00:00,True,Engineering,,2026-09-10T15:31:42.592993+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152890-trade-compliance-analyst,Trade Compliance Analyst,Tech,2026-09-09T16:23:58+00:00,True,Engineering,,2026-09-10T15:31:42.593063+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152887-backend-engineer-net-f-m-d,Backend Engineer (.NET) (f/m/d),Tech,2026-09-09T16:22:51+00:00,True,Engineering,,2026-09-10T15:31:42.593128+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152886-creative-technologist-contract,Creative Technologist (contract),Tech,2026-09-09T16:22:27+00:00,True,Engineering,,2026-09-10T15:31:42.593194+00:00
+1.0,JOB,Jobicy,https://jobicy.com/jobs/152885-oracle-erp-fusion-functional-analyst,Oracle ERP Fusion Functional Analyst,Tech,2026-09-09T16:22:06+00:00,True,Engineering,,2026-09-10T15:31:42.593264+00:00
