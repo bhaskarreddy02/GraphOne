@@ -31,8 +31,8 @@ class GeminiFlashProvider(LLMProvider):
             logger.debug(f"{self.name} skipped: No API key configured.")
             return None
 
-        # Gemini 1.5 / 2.0 Flash endpoint
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={self.api_key}"
+        # Gemini Flash endpoint (supports gemini-2.5-flash and gemini-flash-latest)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.api_key}"
         prompt = (
             f"You are an AI data extraction engine. Extract structured data from the following text into JSON.\n"
             f"Expected JSON Schema:\n{target_schema_desc}\n\n"
@@ -76,7 +76,7 @@ class GeminiFlashProvider(LLMProvider):
 
 
 class GroqLlama3Provider(LLMProvider):
-    name = "Groq Llama 3 (Tier 2)"
+    name = "Groq LPU (Tier 2)"
 
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or GROQ_API_KEY
@@ -89,34 +89,42 @@ class GroqLlama3Provider(LLMProvider):
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) GraphOne/1.0"
         }
-        payload = {
-            "model": "llama-3.3-70b-versatile",
-            "messages": [
-                {
-                    "role": "system",
-                    "content": f"You are a strict data extraction engine. Output valid JSON matching schema:\n{target_schema_desc}"
-                },
-                {"role": "user", "content": text_content}
-            ],
-            "temperature": 0.1,
-            "response_format": {"type": "json_object"}
-        }
+        # Supports high-speed hosted open models on Groq LPUs
+        models_to_try = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "llama-3.3-70b-versatile"]
+        for model_name in models_to_try:
+            payload = {
+                "model": model_name,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": f"You are a strict data extraction engine. Output valid JSON matching schema:\n{target_schema_desc}"
+                    },
+                    {"role": "user", "content": text_content}
+                ],
+                "temperature": 0.1,
+                "response_format": {"type": "json_object"}
+            }
 
-        timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT_SECONDS)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            for attempt in range(3):
-                async with session.post(url, headers=headers, json=payload) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        raw_out = data["choices"][0]["message"]["content"]
-                        return json.loads(raw_out)
-                    elif resp.status == 429:
-                        await BackoffHandler.sleep_with_jitter(attempt)
-                    else:
-                        logger.warning(f"[{self.name} HTTP {resp.status}]: {await resp.text()}")
-                        break
+            timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT_SECONDS)
+            try:
+                async with aiohttp.ClientSession(timeout=timeout) as session:
+                    for attempt in range(2):
+                        async with session.post(url, headers=headers, json=payload) as resp:
+                            if resp.status == 200:
+                                data = await resp.json()
+                                raw_out = data["choices"][0]["message"]["content"]
+                                return json.loads(raw_out)
+                            elif resp.status == 429:
+                                await BackoffHandler.sleep_with_jitter(attempt)
+                            else:
+                                logger.warning(f"[{self.name} {model_name} HTTP {resp.status}]: {await resp.text()}")
+                                break
+            except Exception as e:
+                logger.debug(f"Groq {model_name} error: {e}")
+                continue
         return None
 
 
@@ -134,34 +142,44 @@ class DeepSeekProvider(LLMProvider):
         url = "https://api.deepseek.com/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) GraphOne/1.0"
         }
-        payload = {
-            "model": "deepseek-chat",
-            "messages": [
-                {
-                    "role": "system",
-                    "content": f"You are a strict data extraction engine. Output valid JSON matching schema:\n{target_schema_desc}"
-                },
-                {"role": "user", "content": text_content}
-            ],
-            "temperature": 0.1,
-            "response_format": {"type": "json_object"}
-        }
+        models_to_try = ["deepseek-chat", "deepseek-flash"]
+        for model_name in models_to_try:
+            payload = {
+                "model": model_name,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": f"You are a strict data extraction engine. Output valid JSON matching schema:\n{target_schema_desc}"
+                    },
+                    {"role": "user", "content": text_content}
+                ],
+                "temperature": 0.1,
+                "response_format": {"type": "json_object"}
+            }
 
-        timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT_SECONDS)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            for attempt in range(3):
-                async with session.post(url, headers=headers, json=payload) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        raw_out = data["choices"][0]["message"]["content"]
-                        return json.loads(raw_out)
-                    elif resp.status == 429:
-                        await BackoffHandler.sleep_with_jitter(attempt)
-                    else:
-                        logger.warning(f"[{self.name} HTTP {resp.status}]: {await resp.text()}")
-                        break
+            timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT_SECONDS)
+            try:
+                async with aiohttp.ClientSession(timeout=timeout) as session:
+                    for attempt in range(2):
+                        async with session.post(url, headers=headers, json=payload) as resp:
+                            if resp.status == 200:
+                                data = await resp.json()
+                                raw_out = data["choices"][0]["message"]["content"]
+                                return json.loads(raw_out)
+                            elif resp.status == 429:
+                                await BackoffHandler.sleep_with_jitter(attempt)
+                            elif resp.status == 402:
+                                logger.warning(f"[{self.name}]: HTTP 402 Insufficient Balance on DeepSeek account.")
+                                return None
+                            else:
+                                logger.warning(f"[{self.name} HTTP {resp.status}]: {await resp.text()}")
+                                break
+            except Exception as e:
+                logger.debug(f"DeepSeek {model_name} error: {e}")
+                continue
         return None
 
 
