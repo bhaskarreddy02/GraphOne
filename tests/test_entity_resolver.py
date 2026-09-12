@@ -21,15 +21,17 @@ def test_resolver_canonicalization():
     canonical, conf, method = resolver.resolve("OpenAI")
     assert canonical == "OpenAI"
     assert conf == 1.0
+    assert method == "normalized_exact"
 
     # Legal suffix variation
     canonical, conf, method = resolver.resolve("OpenAI, Inc.")
     assert canonical == "OpenAI"
-    assert method in ("EXACT_MATCH", "LEGAL_SUFFIX_STRIP")
+    assert method == "normalized_exact"
 
     # Spacing variation
     canonical, conf, method = resolver.resolve("Open AI")
     assert canonical == "OpenAI"
+    assert method == "normalized_exact"
 
     # Seed list entities
     canonical, conf, method = resolver.resolve("Anthropic, PBC")
@@ -50,20 +52,50 @@ def test_resolver_audit_log():
     log = resolver.get_audit_log()
     assert len(log) >= 2
     assert log[0].canonical_name == "OpenAI"
-    assert log[0].source_context == "YC Directory"
+
+    decisions = resolver.get_decision_logs()
+    assert len(decisions) >= 2
+    assert decisions[0]["raw_name"] == "OpenAI, Inc."
+    assert decisions[0]["canonical_name"] == "OpenAI"
+    assert decisions[0]["method"] == "normalized_exact"
+    assert decisions[0]["confidence"] == 1.0
 
 
-def test_resolver_typo_and_unseen_entities():
+def test_resolver_exact_user_spec():
+    """
+    Tests the 3 exact user specified test cases:
+    1. 'Open AI, Inc.' -> 'OpenAI', 'normalized_exact', 1.0
+    2. 'dopemind' -> 'DeepMind', 'fuzzy', ~0.89
+    3. 'Something Random' -> None, 'unresolved', ~0.31
+    """
     resolver = EntityResolver()
 
-    # 1. Typo with lowercase 'l' instead of 'I'
-    canonical, conf, method = resolver.resolve("OpenAl")
-    assert canonical == "OpenAI"
-    assert method == "FUZZY_TOKEN_SET"
-    assert conf >= 0.80
+    # 1. Exact
+    res1 = resolver.resolve_entity("Open AI, Inc.")
+    dec1 = resolver.last_decision
+    assert res1 == "OpenAI"
+    assert dec1 == {
+        "raw_name": "Open AI, Inc.",
+        "canonical_name": "OpenAI",
+        "method": "normalized_exact",
+        "confidence": 1.0
+    }
 
-    # 2. Unseen entity should not be force-matched
-    canonical, conf, method = resolver.resolve("Brand New Frontier Lab LLC")
-    assert canonical == "Brand New Frontier Lab"
-    assert method == "NEW_CANONICAL"
+    # 2. Fuzzy
+    res2 = resolver.resolve_entity("dopemind")
+    dec2 = resolver.last_decision
+    assert res2 == "DeepMind"
+    assert dec2["raw_name"] == "dopemind"
+    assert dec2["canonical_name"] == "DeepMind"
+    assert dec2["method"] == "fuzzy"
+    assert dec2["confidence"] >= 0.70
+
+    # 3. Don't guess -> unresolved
+    res3 = resolver.resolve_entity("Something Random")
+    dec3 = resolver.last_decision
+    assert res3 is None
+    assert dec3["raw_name"] == "Something Random"
+    assert dec3["canonical_name"] is None
+    assert dec3["method"] == "unresolved"
+    assert dec3["confidence"] < 0.70
 

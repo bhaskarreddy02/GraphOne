@@ -123,8 +123,10 @@ async def handle_startups(request: web.Request) -> web.Response:
     elif sort_by == "name":
         items.sort(key=lambda s: str(s.get("content.entityName", "")).lower())
 
-    limit = int(request.query.get("limit", "1000"))
-    return web.json_response({"total": len(items), "data": items[:limit]})
+    limit_param = request.query.get("limit")
+    if limit_param and limit_param.isdigit() and int(limit_param) > 0:
+        return web.json_response({"total": len(items), "data": items[:int(limit_param)]})
+    return web.json_response({"total": len(items), "data": items})
 
 
 async def handle_products(request: web.Request) -> web.Response:
@@ -135,8 +137,10 @@ async def handle_products(request: web.Request) -> web.Response:
         items = [p for p in items if p.get("content.pricingModel") == pricing]
     if query:
         items = [p for p in items if query in str(p.get("product_name", "")).lower() or query in str(p.get("content.startupName", "")).lower()]
-    limit = int(request.query.get("limit", "1000"))
-    return web.json_response({"total": len(items), "data": items[:limit]})
+    limit_param = request.query.get("limit")
+    if limit_param and limit_param.isdigit() and int(limit_param) > 0:
+        return web.json_response({"total": len(items), "data": items[:int(limit_param)]})
+    return web.json_response({"total": len(items), "data": items})
 
 
 async def handle_papers(request: web.Request) -> web.Response:
@@ -163,10 +167,10 @@ async def handle_papers(request: web.Request) -> web.Response:
             p for p in items
             if query in str(p.get("content.title", "")).lower()
             or query in str(p.get("content.authors", "")).lower()
-            or query in str(p.get("content.github_url", "")).lower()
+            or query in str(p.get("content.abstract", "")).lower()
         ]
 
-    # 4. Sorting & Ranking
+    # 4. Sorting logic
     def get_num(val, default=0):
         try:
             return float(val) if val is not None and str(val).strip() != "" else default
@@ -191,11 +195,12 @@ async def handle_papers(request: web.Request) -> web.Response:
             reverse=True
         )
 
-    limit = int(request.query.get("limit", "1000"))
+    limit_param = request.query.get("limit")
+    sliced = items[:int(limit_param)] if (limit_param and limit_param.isdigit() and int(limit_param) > 0) else items
     return web.json_response({
         "total": len(items),
         "total_with_code": sum(1 for p in store.papers if str(p.get("content.github_url", "")).strip()),
-        "data": items[:limit]
+        "data": sliced
     })
 
 
@@ -226,21 +231,26 @@ async def handle_mappings(request: web.Request) -> web.Response:
     items = store.mappings
     if query:
         items = [m for m in items if query in str(m.get("raw_name", "")).lower() or query in str(m.get("canonical_name", "")).lower()]
-    limit = int(request.query.get("limit", "500"))
-    return web.json_response({"total": len(items), "data": items[:limit]})
+    limit_param = request.query.get("limit")
+    sliced = items[:int(limit_param)] if (limit_param and limit_param.isdigit() and int(limit_param) > 0) else items
+    return web.json_response({"total": len(items), "data": sliced})
 
 
 async def handle_resolve_live(request: web.Request) -> web.Response:
-    """Real-time deterministic entity resolution API for interactive testing."""
+    """Deterministic entity resolution: Exact normalized lookup + RapidFuzz similarity matching."""
     try:
         body = await request.json()
-        raw_name = body.get("name", "")
-        canonical, confidence, method = store.resolver.resolve(raw_name, source_context="UI Interactive Tester")
+        raw_name = (body.get("name") or "").strip()
+        if not raw_name:
+            return web.json_response({"error": "Empty name provided"}, status=400)
+
+        decision = store.resolver.resolve_entity(raw_name, return_details=True)
         return web.json_response({
-            "raw_name": raw_name,
-            "canonical_name": canonical,
-            "confidence_score": confidence,
-            "resolution_method": method
+            "raw_name": decision["raw_name"],
+            "canonical_name": decision["canonical_name"],
+            "confidence_score": decision["confidence"],
+            "resolution_method": decision["method"],
+            "decision": decision,
         })
     except Exception as e:
         return web.json_response({"error": str(e)}, status=400)

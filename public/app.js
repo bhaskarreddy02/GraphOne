@@ -170,11 +170,14 @@ tabBtns.forEach(btn => {
     currentPage = 1;
     currentData = []; // Clear so loadTabData shows "Loading..." for new tab
 
+    const resolverContainer = document.getElementById('resolver-container');
+
     if (currentTab === 'graph') {
       contentContainer.style.display = 'none';
       controlsBar.style.display = 'none';
       archContainer.style.display = 'none';
       if (pipelineContainer) pipelineContainer.style.display = 'none';
+      if (resolverContainer) resolverContainer.style.display = 'none';
       graphContainer.style.display = 'block';
       initKnowledgeGraph();
     } else if (currentTab === 'architecture') {
@@ -182,20 +185,30 @@ tabBtns.forEach(btn => {
       controlsBar.style.display = 'none';
       graphContainer.style.display = 'none';
       if (pipelineContainer) pipelineContainer.style.display = 'none';
+      if (resolverContainer) resolverContainer.style.display = 'none';
       archContainer.style.display = 'block';
     } else if (currentTab === 'pipeline') {
       contentContainer.style.display = 'none';
       controlsBar.style.display = 'none';
       graphContainer.style.display = 'none';
       archContainer.style.display = 'none';
+      if (resolverContainer) resolverContainer.style.display = 'none';
       if (pipelineContainer) pipelineContainer.style.display = 'block';
       loadPipelineData();
+    } else if (currentTab === 'resolver') {
+      contentContainer.style.display = 'none';
+      controlsBar.style.display = 'none';
+      graphContainer.style.display = 'none';
+      archContainer.style.display = 'none';
+      if (pipelineContainer) pipelineContainer.style.display = 'none';
+      if (resolverContainer) resolverContainer.style.display = 'block';
     } else {
       contentContainer.style.display = 'block';
       controlsBar.style.display = 'flex';
       graphContainer.style.display = 'none';
       archContainer.style.display = 'none';
       if (pipelineContainer) pipelineContainer.style.display = 'none';
+      if (resolverContainer) resolverContainer.style.display = 'none';
 
 
       if (filterTeamSize) {
@@ -695,22 +708,30 @@ async function testEntityResolution() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: raw })
     });
-    const data = await res.json();
+    const isResolved = Boolean(data.canonical_name);
     resRaw.textContent = data.raw_name;
-    resCanonical.textContent = data.canonical_name;
+    resCanonical.textContent = isResolved ? data.canonical_name : 'null (unresolved)';
+    resCanonical.style.color = isResolved ? '#10b981' : '#f59e0b';
     resConf.textContent = Math.round(data.confidence_score * 100) + '%';
     resMethod.textContent = data.resolution_method;
-    showToast(`Resolved "${data.raw_name}" ➔ "${data.canonical_name}"`);
+
+    if (isResolved) {
+      showToast(`Resolved "${data.raw_name}" ➔ "${data.canonical_name}"`);
+    } else {
+      showToast(`Unresolved: "${data.raw_name}" (No match above threshold)`);
+    }
 
     // Record user activity
     if (window.trackActivity) {
       window.trackActivity({
         type: 'search',
         title: `Resolved: "${data.raw_name}"`,
-        subtitle: `Canonical: ${data.canonical_name} (${Math.round(data.confidence_score * 100)}% via ${data.resolution_method})`,
+        subtitle: isResolved 
+          ? `Canonical: ${data.canonical_name} (${Math.round(data.confidence_score * 100)}% via ${data.resolution_method})`
+          : `Unresolved (${Math.round(data.confidence_score * 100)}% confidence)`,
         url: '#playground',
-        badge: 'ENTITY',
-        meta: { raw: data.raw_name, canonical: data.canonical_name }
+        badge: isResolved ? 'RESOLVED' : 'UNRESOLVED',
+        meta: { raw: data.raw_name, canonical: data.canonical_name, method: data.resolution_method }
       });
     }
   } catch (err) {
@@ -800,11 +821,18 @@ filterSecondary.addEventListener('change', () => {
   loadTabData();
 });
 
-refreshBtn.addEventListener('click', () => {
+ // Refresh feed button
+refreshBtn.addEventListener('click', async () => {
+  const prevCount = currentData.length;
   currentPage = 1;
-  loadStats();
-  loadTabData();
-  showToast('Refreshed live intelligence feed.');
+  await loadStats();
+  await loadTabData();
+  const diff = currentData.length - prevCount;
+  if (diff > 0) {
+    showToast(`Refreshed live feed: +${diff} new items added since last view!`);
+  } else {
+    showToast('Refreshed live intelligence feed: All records up to date.');
+  }
 });
 
 // Interactive Knowledge Graph Canvas Animation
@@ -870,10 +898,9 @@ function initKnowledgeGraph() {
       ctx.shadowBlur = 0;
 
       // Label
-      ctx.fillStyle = '#E2E8F0';
-      ctx.font = '11px Outfit, Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(n.name, n.x, n.y + 20);
+      ctx.fillStyle = '#EDEDF0';
+      ctx.font = '11px Inter, sans-serif';
+      ctx.fillText(n.name, n.x + 12, n.y + 4);
     }
 
     graphAnimId = requestAnimationFrame(draw);
@@ -891,26 +918,60 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// Run Pipeline button listener
+// Run Pipeline button listener with live sync progress & count detection
 const btnRunPipeline = document.getElementById('btn-run-pipeline-now');
 if (btnRunPipeline) {
   btnRunPipeline.addEventListener('click', async () => {
     btnRunPipeline.disabled = true;
-    btnRunPipeline.innerHTML = '⏳ Running Cycle Across 10 Sources...';
-    showToast('Continuous monitoring cycle initiated across all 10 sources...');
+    btnRunPipeline.innerHTML = '⏳ Syncing 10 Live Feeds with Gemini & Groq...';
+    showToast('Incremental monitoring sync started across all 10 sources...');
+
     try {
+      // Get current latest run id to detect new run completion
+      const initialStatusRes = await fetch('/api/pipeline/status');
+      const initialStatus = await initialStatusRes.json();
+      const lastRunId = (initialStatus.recent_runs && initialStatus.recent_runs[0]) ? initialStatus.recent_runs[0].run_id : null;
+
       await fetch('/api/pipeline/run-now', { method: 'POST' });
-      setTimeout(async () => {
-        await loadPipelineData();
-        await loadStats();
-        btnRunPipeline.disabled = false;
-        btnRunPipeline.innerHTML = '<span id="pipeline-btn-icon">▶</span> Run Monitoring Cycle Now';
-        showToast('Pipeline cycle finished and SQLite state refreshed!');
-      }, 5000);
+
+      // Poll every 2.5 seconds until new run finishes
+      let pollAttempts = 0;
+      const pollInterval = setInterval(async () => {
+        pollAttempts++;
+        try {
+          const pollRes = await fetch('/api/pipeline/status');
+          const pollData = await pollRes.json();
+          const latestRun = pollData.recent_runs && pollData.recent_runs[0];
+
+          if (latestRun && latestRun.run_id !== lastRunId && latestRun.status === 'SUCCESS') {
+            clearInterval(pollInterval);
+            await loadPipelineData();
+            await loadStats();
+            await loadTabData();
+            btnRunPipeline.disabled = false;
+            btnRunPipeline.innerHTML = '<span id="pipeline-btn-icon">▶</span> Run Monitoring Cycle Now';
+
+            const freshCount = latestRun.passed_freshness || 0;
+            const seenCount = (latestRun.summary && latestRun.summary.already_seen_skipped) || (latestRun.new_items_found - freshCount - latestRun.discarded_stale) || 0;
+            showToast(`✅ Sync Complete: +${freshCount} new items ingested since last sync (${seenCount} already seen skipped)`);
+          } else if (pollAttempts > 45) { // Timeout safety after ~110s
+            clearInterval(pollInterval);
+            await loadPipelineData();
+            await loadStats();
+            await loadTabData();
+            btnRunPipeline.disabled = false;
+            btnRunPipeline.innerHTML = '<span id="pipeline-btn-icon">▶</span> Run Monitoring Cycle Now';
+            showToast('Sync completed in background. State refreshed.');
+          }
+        } catch (pollErr) {
+          console.error('Poll error:', pollErr);
+        }
+      }, 2500);
+
     } catch (e) {
       btnRunPipeline.disabled = false;
       btnRunPipeline.innerHTML = '<span id="pipeline-btn-icon">▶</span> Run Monitoring Cycle Now';
-      showToast('Cycle trigger error');
+      showToast('Cycle trigger error: ' + e.message);
     }
   });
 }

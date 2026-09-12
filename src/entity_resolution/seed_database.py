@@ -46,9 +46,29 @@ SEED_CANONICAL_STARTUPS: Dict[str, Dict[str, Any]] = {
         "domain": "runwayml.com",
         "aliases": ["Runway", "RunwayML", "Runway AI, Inc.", "Runway Research"]
     },
-    "Google DeepMind": {
+    "DeepMind": {
         "domain": "deepmind.google",
         "aliases": ["DeepMind", "Deep Mind", "Google DeepMind", "DeepMind Technologies Ltd."]
+    },
+    "Apple": {
+        "domain": "apple.com",
+        "aliases": ["Apple", "Apple Inc.", "Apple, Inc.", "Apple Computer"]
+    },
+    "Google": {
+        "domain": "google.com",
+        "aliases": ["Google", "Google LLC", "Google Inc.", "Alphabet"]
+    },
+    "Microsoft": {
+        "domain": "microsoft.com",
+        "aliases": ["Microsoft", "Microsoft Corporation", "Microsoft Corp.", "MSFT"]
+    },
+    "Meta": {
+        "domain": "meta.com",
+        "aliases": ["Meta", "Meta Platforms", "Facebook", "Meta Platforms Inc."]
+    },
+    "NVIDIA": {
+        "domain": "nvidia.com",
+        "aliases": ["NVIDIA", "Nvidia", "Nvidia Corp", "NVIDIA Corporation"]
     },
     "Midjourney": {
         "domain": "midjourney.com",
