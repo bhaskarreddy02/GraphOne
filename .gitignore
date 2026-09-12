@@ -14,3 +14,10 @@ ENV/
 .coverage
 htmlcov/
 *.log
+
+# SQLite WAL/SHM temp files (auto-created at runtime)
+data/*.db-shm
+data/*.db-wal
+
+# Scratch/temp scripts
+scratch/

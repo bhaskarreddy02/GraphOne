@@ -83,24 +83,13 @@ async function loadStats() {
     if (kpiStartups) kpiStartups.textContent = Number(data.startups_count).toLocaleString();
     if (kpiProducts) kpiProducts.textContent = Number(data.products_count).toLocaleString();
     if (kpiPapers) kpiPapers.textContent = Number(data.papers_count).toLocaleString();
+    const kpiJobs = document.getElementById('kpi-jobs');
+    if (kpiJobs) kpiJobs.textContent = Number(data.jobs_count).toLocaleString();
+    const kpiNews = document.getElementById('kpi-news');
+    if (kpiNews) kpiNews.textContent = Number(data.news_count).toLocaleString();
     if (kpiSignals) kpiSignals.textContent = (data.jobs_count + data.news_count).toLocaleString();
     if (kpiAccuracy) kpiAccuracy.textContent = (data.avg_confidence * 100).toFixed(1) + '%';
     if (kpiFreshSub) kpiFreshSub.textContent = '100% verified <24h';
-
-    const countEls = {
-      startups: document.getElementById('count-startups'),
-      products: document.getElementById('count-products'),
-      papers: document.getElementById('count-papers'),
-      jobs: document.getElementById('count-jobs'),
-      news: document.getElementById('count-news'),
-      mappings: document.getElementById('count-mappings'),
-    };
-    if (countEls.startups) countEls.startups.textContent = Number(data.startups_count).toLocaleString();
-    if (countEls.products) countEls.products.textContent = Number(data.products_count).toLocaleString();
-    if (countEls.papers) countEls.papers.textContent = Number(data.papers_count).toLocaleString();
-    if (countEls.jobs) countEls.jobs.textContent = Number(data.jobs_count).toLocaleString();
-    if (countEls.news) countEls.news.textContent = Number(data.news_count).toLocaleString();
-    if (countEls.mappings) countEls.mappings.textContent = Number(data.mappings_count).toLocaleString();
   } catch (err) {
     console.error('Failed to load stats:', err);
   }
@@ -439,6 +428,7 @@ function renderTable() {
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
               ${website ? `<a href="${website}" target="_blank" class="btn-link-action btn-paper" title="Visit Official Website">🌐 Website</a>` : ''}
               ${ycUrl ? `<a href="${ycUrl}" target="_blank" class="btn-link-action btn-repo" title="View YC Directory Dossier">🔗 YC Profile</a>` : ''}
+              <button class="explore-graph-btn" onclick="openEntityGraph('${escapeHtml(s['content.entityName'] || '')}')" title="View Near-Linkage Graph">🕸️ Graph</button>
             </div>
           </td>
         </tr>
@@ -467,7 +457,12 @@ function renderTable() {
           <td style="color: var(--accent);">${escapeHtml(p['content.startupName'] || '')}</td>
           <td><span class="badge ${badgeClass}">${tier}</span></td>
           <td style="font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(p['category'] || 'AI Software')}</td>
-          <td><a href="${p['source.url']}" target="_blank" class="badge-source">🔗 Visit Site</a></td>
+          <td>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <a href="${p['source.url']}" target="_blank" class="badge-source">🔗 Visit Site</a>
+              <button class="explore-graph-btn" onclick="openEntityGraph('${escapeHtml(p['product_name'] || p['content.startupName'] || '')}', 'products')" title="View Product Linkage Graph">🕸️ Graph</button>
+            </div>
+          </td>
         </tr>
       `;
     }).join('');
@@ -540,6 +535,7 @@ function renderTable() {
               ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" class="btn-link-action btn-pdf" title="Open direct PDF">📥 PDF</a>` : ''}
               ${githubUrl ? `<a href="${githubUrl}" target="_blank" class="btn-link-action btn-repo" title="Open verified repository code">💻 Code Repo</a>` : ''}
               ${hfUrl ? `<a href="${hfUrl}" target="_blank" class="btn-link-action btn-hf" title="Open Hugging Face paper page">🤗 HF</a>` : ''}
+              <button class="explore-graph-btn" onclick="openEntityGraph('${escapeHtml(r['content.title'] || '')}', 'papers')" title="View Paper Linkage Graph">🕸️ Graph</button>
             </div>
           </td>
         </tr>
@@ -552,7 +548,7 @@ function renderTable() {
       <th>Company</th>
       <th>Freshness Status</th>
       <th>Category</th>
-      <th>Job Link</th>
+      <th>Job Link &amp; Actions</th>
     `;
     if (!pageData.length) {
       tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">No jobs found.</td></tr>';
@@ -570,7 +566,12 @@ function renderTable() {
           </span>
         </td>
         <td><span class="badge badge-freemium">${escapeHtml(j['content.role_family'] || 'Engineering')}</span></td>
-        <td><a href="${j['job_url'] || j['source.name']}" target="_blank" class="badge-source">🔗 Apply</a></td>
+        <td>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <a href="${j['job_url'] || j['source.name']}" target="_blank" class="badge-source">🔗 Apply</a>
+            <button class="explore-graph-btn" onclick="openEntityGraph('${escapeHtml(j['title'] || '')}', 'jobs')" title="View Job Linkage Graph">🕸️ Graph</button>
+          </div>
+        </td>
       </tr>
     `).join('');
   } else if (currentTab === 'news') {
@@ -580,7 +581,7 @@ function renderTable() {
       <th>Source Outlet</th>
       <th>Published Timestamp</th>
       <th>Summary / Excerpt</th>
-      <th>Source Link</th>
+      <th>Source Link &amp; Actions</th>
     `;
     if (!pageData.length) {
       tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">No news found.</td></tr>';
@@ -595,7 +596,12 @@ function renderTable() {
           ${(n['content.published_date'] || '').replace('T', ' ').slice(0, 19)} UTC
         </td>
         <td style="max-width: 360px; font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(n['summary'] || '')}</td>
-        <td><a href="${n['source.url']}" target="_blank" class="badge-source">🔗 Read Article</a></td>
+        <td>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <a href="${n['source.url']}" target="_blank" class="badge-source">🔗 Read Article</a>
+            <button class="explore-graph-btn" onclick="openEntityGraph('${escapeHtml(n['content.title'] || '')}', 'news')" title="View News Linkage Graph">🕸️ Graph</button>
+          </div>
+        </td>
       </tr>
     `).join('');
   } else if (currentTab === 'mappings') {
@@ -835,79 +841,590 @@ refreshBtn.addEventListener('click', async () => {
   }
 });
 
-// Interactive Knowledge Graph Canvas Animation
-let graphAnimId;
-function initKnowledgeGraph() {
-  const canvas = document.getElementById('graph-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  canvas.width = canvas.parentElement.clientWidth - 40;
-  canvas.height = 460;
+// ============================================================
+// DYNAMIC MULTI-CATEGORY VENTURE KNOWLEDGE GRAPH (VIS-NETWORK)
+// ============================================================
+let graphNetwork = null;
+let currentGraphCategory = 'startups';
+let currentGraphEntity = 'OpenAI';
+let graphEntitiesList = [];
 
-  const nodes = [
-    { id: 1, name: 'OpenAI', type: 'startup', x: 200, y: 150, vx: 0.2, vy: 0.1, color: '#4F8CFF' },
-    { id: 2, name: 'ChatGPT', type: 'product', x: 280, y: 240, vx: -0.15, vy: 0.2, color: '#5EEAD4' },
-    { id: 3, name: 'Anthropic', type: 'startup', x: 450, y: 120, vx: 0.1, vy: -0.1, color: '#4F8CFF' },
-    { id: 4, name: 'Claude 3.5', type: 'product', x: 550, y: 220, vx: -0.1, vy: 0.15, color: '#5EEAD4' },
-    { id: 5, name: 'Attention Is All You Need', type: 'paper', x: 350, y: 340, vx: 0.1, vy: 0.2, color: '#FBBF24' },
-    { id: 6, name: 'Mistral AI', type: 'startup', x: 700, y: 160, vx: -0.2, vy: 0.1, color: '#4F8CFF' },
-    { id: 7, name: 'Mistral Large', type: 'product', x: 780, y: 250, vx: 0.15, vy: -0.15, color: '#5EEAD4' },
-    { id: 8, name: 'AI Research Eng', type: 'job', x: 400, y: 220, vx: 0.1, vy: -0.1, color: '#C084FC' },
-    { id: 9, name: 'Hugging Face', type: 'startup', x: 880, y: 130, vx: -0.1, vy: 0.1, color: '#4F8CFF' },
-    { id: 10, name: 'Transformers', type: 'product', x: 920, y: 270, vx: 0.1, vy: 0.1, color: '#5EEAD4' },
-    { id: 11, name: 'Perplexity AI', type: 'startup', x: 150, y: 320, vx: 0.1, vy: -0.1, color: '#4F8CFF' },
-  ];
+const CATEGORY_PRESETS = {
+  startups: [
+    { name: 'OpenAI', label: 'OpenAI' },
+    { name: 'Anthropic', label: 'Anthropic' },
+    { name: 'Cohere', label: 'Cohere' },
+    { name: 'DeepMind', label: 'DeepMind' },
+    { name: 'Mistral AI', label: 'Mistral AI' },
+    { name: 'DeepMark', label: 'DeepMark (YC)' },
+    { name: 'Maritime', label: 'Maritime (YC)' }
+  ],
+  products: [
+    { name: 'ChatGPT', label: 'ChatGPT' },
+    { name: 'Claude 3.5 Sonnet', label: 'Claude 3.5' },
+    { name: 'Cursor', label: 'Cursor' },
+    { name: 'Notion AI', label: 'Notion AI' },
+    { name: 'Gemini 1.5 Pro', label: 'Gemini Pro' },
+    { name: 'Midjourney v6', label: 'Midjourney' }
+  ],
+  papers: [
+    { name: 'Attention Is All You Need', label: 'Attention Is All You Need' },
+    { name: 'DeepSeek-R1', label: 'DeepSeek-R1' },
+    { name: 'Whisper ASR', label: 'Whisper' },
+    { name: 'Llama 3', label: 'Llama 3' },
+    { name: 'Chain-of-Thought', label: 'Chain-of-Thought' }
+  ],
+  jobs: [
+    { name: 'Engineering Manager', label: 'Engineering Manager' },
+    { name: 'Senior AI Engineer', label: 'Senior AI Engineer' },
+    { name: 'Founding Engineer', label: 'Founding Engineer' },
+    { name: 'Research Scientist', label: 'Research Scientist' }
+  ],
+  news: [
+    { name: 'Mecka AI', label: 'Mecka AI' },
+    { name: 'Anthropic Claude', label: 'Anthropic Claude' },
+    { name: 'OpenAI Funding', label: 'OpenAI Funding' },
+    { name: 'Mistral AI', label: 'Mistral AI' }
+  ]
+};
 
-  const links = [
-    [1, 2], [3, 4], [6, 7], [9, 10], [1, 5], [3, 5], [1, 8], [3, 8], [6, 8], [1, 11]
-  ];
+const CATEGORY_PLACEHOLDERS = {
+  startups: 'Search startup name (e.g. OpenAI, Anthropic, Cohere, DeepMark, Maritime)...',
+  products: 'Search product name (e.g. ChatGPT, Claude 3.5, Cursor, Notion AI)...',
+  papers: 'Search research paper (e.g. Attention Is All You Need, DeepSeek-R1, Whisper)...',
+  jobs: 'Search job role (e.g. Engineering Manager, Senior AI Engineer, Research Scientist)...',
+  news: 'Search news headline or company (e.g. Mecka AI, Anthropic, OpenAI)...'
+};
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+async function loadGraphEntitiesList(catType = 'startups') {
+  try {
+    const res = await fetch(`/api/graph/entities?type=${encodeURIComponent(catType)}`);
+    const data = await res.json();
+    if (data && data.entities) {
+      graphEntitiesList = data.entities;
+      const datalist = document.getElementById('graph-entities-datalist');
+      if (datalist) {
+        datalist.innerHTML = data.entities.map(e => `<option value="${escapeHtml(e.name)}">${escapeHtml(e.source)}</option>`).join('');
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load graph entities list:', err);
+  }
+}
 
-    // Draw links
-    ctx.lineWidth = 1;
-    for (const [fromId, toId] of links) {
-      const from = nodes.find(n => n.id === fromId);
-      const to = nodes.find(n => n.id === toId);
-      if (!from || !to) continue;
-      const grad = ctx.createLinearGradient(from.x, from.y, to.x, to.y);
-      grad.addColorStop(0, 'rgba(79, 140, 255, 0.2)');
-      grad.addColorStop(1, 'rgba(79, 140, 255, 0.08)');
-      ctx.strokeStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(from.x, from.y);
-      ctx.lineTo(to.x, to.y);
-      ctx.stroke();
+function renderPresetChips(category, activeEntity = null) {
+  const chipsContainer = document.getElementById('graph-preset-chips');
+  if (!chipsContainer) return;
+  const presets = CATEGORY_PRESETS[category] || [];
+  chipsContainer.innerHTML = `
+    <span class="chip-label">Quick Select:</span>
+    ${presets.map(p => {
+      const isActive = activeEntity && p.name.toLowerCase() === activeEntity.toLowerCase();
+      return `<button class="graph-chip ${isActive ? 'active' : ''}" data-entity="${escapeHtml(p.name)}">${escapeHtml(p.label)}</button>`;
+    }).join('')}
+  `;
+
+  chipsContainer.querySelectorAll('.graph-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      loadEntityGraph(chip.dataset.entity, currentGraphCategory);
+    });
+  });
+}
+
+function switchGraphCategory(category, optionalEntity = null) {
+  if (!category) category = 'startups';
+  currentGraphCategory = category;
+
+  // 1. Update active pill in UI
+  document.querySelectorAll('.graph-cat-pill').forEach(pill => {
+    if (pill.dataset.category === category) {
+      pill.classList.add('active');
+    } else {
+      pill.classList.remove('active');
+    }
+  });
+
+  // 2. Update placeholder & load entities list for datalist
+  const inputEl = document.getElementById('graph-entity-input');
+  if (inputEl) {
+    inputEl.placeholder = CATEGORY_PLACEHOLDERS[category] || 'Search...';
+  }
+  loadGraphEntitiesList(category);
+
+  // 3. Render quick select chips for this category
+  const presets = CATEGORY_PRESETS[category] || [];
+  const defaultTarget = optionalEntity || (presets[0] ? presets[0].name : '');
+  renderPresetChips(category, defaultTarget);
+
+  // 4. Load the graph
+  if (defaultTarget) {
+    loadEntityGraph(defaultTarget, category);
+  }
+}
+
+async function loadEntityGraph(entityName, category = null) {
+  if (!entityName || !entityName.trim()) return;
+  const target = entityName.trim();
+  currentGraphEntity = target;
+  if (category) currentGraphCategory = category;
+
+  const inputEl = document.getElementById('graph-entity-input');
+  if (inputEl) inputEl.value = target;
+
+  // Highlight active preset chip if matches
+  document.querySelectorAll('.graph-chip').forEach(c => {
+    if (c.dataset.entity && c.dataset.entity.toLowerCase() === target.toLowerCase()) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+
+  const canvasWrapper = document.getElementById('vis-network-canvas');
+  if (!canvasWrapper) return;
+
+  canvasWrapper.innerHTML = `
+    <div style="display: flex; height: 100%; align-items: center; justify-content: center; flex-direction: column; gap: 14px; color: #A5B4FC;">
+      <div class="spinner" style="width: 36px; height: 36px; border: 3px solid rgba(99,102,241,0.2); border-top-color: #6366F1; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+      <span style="font-size: 0.9rem; font-weight: 500;">Extracting 360° linkages for ${currentGraphCategory.toUpperCase()} "${escapeHtml(target)}"...</span>
+    </div>
+  `;
+
+  try {
+    const res = await fetch(`/api/graph/entity?name=${encodeURIComponent(target)}&type=${encodeURIComponent(currentGraphCategory)}`);
+    const data = await res.json();
+
+    if (data.error) {
+      canvasWrapper.innerHTML = `<div style="padding: 40px; text-align: center; color: #F87171;">${data.error}</div>`;
+      return;
     }
 
-    // Update and draw nodes
-    for (const n of nodes) {
-      n.x += n.vx;
-      n.y += n.vy;
-      if (n.x < 50 || n.x > canvas.width - 50) n.vx *= -1;
-      if (n.y < 50 || n.y > canvas.height - 50) n.vy *= -1;
+    renderVisNetwork(data);
+    updateNodeInspector(data.nodes[0] || null, data.startup);
 
-      // Glow
-      ctx.shadowBlur = 14;
-      ctx.shadowColor = n.color;
-      ctx.fillStyle = n.color;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, 8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      // Label
-      ctx.fillStyle = '#EDEDF0';
-      ctx.font = '11px Inter, sans-serif';
-      ctx.fillText(n.name, n.x + 12, n.y + 4);
+    // Track user activity
+    if (window.trackActivity) {
+      window.trackActivity({
+        type: 'graph',
+        title: `Graph (${currentGraphCategory.toUpperCase()}): "${data.canonical_name}"`,
+        subtitle: `${data.counts.total_nodes} nodes · ${data.counts.total_edges} linkages`,
+        url: '#graph',
+        badge: 'GRAPH',
+        meta: { entity: data.canonical_name, category: currentGraphCategory, nodes: data.counts.total_nodes }
+      });
     }
 
-    graphAnimId = requestAnimationFrame(draw);
+  } catch (err) {
+    console.error('Error loading entity graph:', err);
+    canvasWrapper.innerHTML = `<div style="padding: 40px; text-align: center; color: #F87171;">Failed to load graph: ${err.message}</div>`;
+  }
+}
+
+function renderVisNetwork(graphData) {
+  const container = document.getElementById('vis-network-canvas');
+  if (!container || typeof vis === 'undefined') {
+    console.warn('vis library not loaded or container missing');
+    return;
   }
 
-  cancelAnimationFrame(graphAnimId);
-  draw();
+  container.innerHTML = '';
+
+  // Strip any arrows from edges for clean, modern spline linkages
+  const cleanEdges = (graphData.edges || []).map(e => ({
+    ...e,
+    arrows: ''
+  }));
+
+  const nodes = new vis.DataSet(graphData.nodes);
+  const edges = new vis.DataSet(cleanEdges);
+
+  const data = { nodes: nodes, edges: edges };
+
+  const options = {
+    nodes: {
+      shape: 'dot',
+      scaling: {
+        min: 16,
+        max: 42
+      },
+      font: {
+        color: '#EDEDF0',
+        size: 13,
+        face: 'Inter, sans-serif'
+      },
+      borderWidth: 2,
+      shadow: {
+        enabled: true,
+        color: 'rgba(0,0,0,0.6)',
+        size: 10,
+        x: 0,
+        y: 4
+      }
+    },
+    edges: {
+      width: 1.8,
+      arrows: '',
+      color: {
+        color: 'rgba(255, 255, 255, 0.16)',
+        highlight: '#818CF8',
+        hover: '#60A5FA'
+      },
+      font: {
+        color: '#94A3B8',
+        size: 10,
+        align: 'middle',
+        background: 'rgba(13, 17, 28, 0.85)'
+      },
+      smooth: {
+        type: 'continuous',
+        roundness: 0.34
+      }
+    },
+    physics: {
+      solver: 'forceAtlas2Based',
+      forceAtlas2Based: {
+        gravitationalConstant: -110,
+        centralGravity: 0.005,
+        springLength: 170,
+        springConstant: 0.05,
+        damping: 0.35,
+        avoidOverlap: 0.85
+      },
+      stabilization: {
+        iterations: 160,
+        updateInterval: 25
+      }
+    },
+    interaction: {
+      hover: true,
+      hoverConnectedEdges: true,
+      tooltipDelay: 0,
+      zoomView: true,
+      dragView: true,
+      navigationButtons: false
+    }
+  };
+
+  graphNetwork = new vis.Network(container, data, options);
+  window.graphNetwork = graphNetwork;
+  window.showNodeDialog = showNodeDialog;
+  window.hideNodeDialog = hideNodeDialog;
+
+  const previewCard = document.getElementById('graph-preview-card');
+  const canvasWrapper = document.querySelector('.graph-canvas-wrapper');
+  let activeHoverNodeId = null;
+  let hideDialogTimer = null;
+
+  function updateDialogPosition(nodeId) {
+    if (!nodeId || !previewCard || !canvasWrapper || !graphNetwork) return;
+    try {
+      const nodePos = graphNetwork.getPosition(nodeId);
+      if (!nodePos || (nodePos.x === undefined && nodePos.y === undefined)) return;
+      const domPos = graphNetwork.canvasToDOM(nodePos);
+      const wrapperRect = canvasWrapper.getBoundingClientRect();
+
+      let left = domPos.x;
+      let top = domPos.y;
+
+      // Check if node is too close to the top of canvas
+      if (top < 220) {
+        previewCard.classList.add('flip-below');
+      } else {
+        previewCard.classList.remove('flip-below');
+      }
+
+      // Keep left within horizontal boundaries
+      if (left - 165 < 12) left = 177;
+      if (left + 165 > wrapperRect.width - 12) left = wrapperRect.width - 177;
+
+      previewCard.style.left = `${left}px`;
+      previewCard.style.top = `${top}px`;
+    } catch (err) {}
+  }
+
+  function showNodeDialog(nodeId) {
+    if (hideDialogTimer) {
+      clearTimeout(hideDialogTimer);
+      hideDialogTimer = null;
+    }
+    if (!nodeId) return;
+    activeHoverNodeId = nodeId;
+    const node = graphData.nodes.find(n => n.id === nodeId);
+    if (!node || !previewCard || !canvasWrapper) return;
+
+    const meta = node.meta || {};
+    const type = meta.type || node.group || 'Entity';
+    const cleanName = meta.name || meta.title || node.label.replace(/^[^\w]+/, '');
+
+    let badgeBg = 'rgba(99, 102, 241, 0.2)';
+    let badgeColor = '#A5B4FC';
+    if (type.includes('Paper')) { badgeBg = 'rgba(245, 158, 11, 0.2)'; badgeColor = '#FDE68A'; }
+    else if (type.includes('Product')) { badgeBg = 'rgba(16, 185, 129, 0.2)'; badgeColor = '#A7F3D0'; }
+    else if (type.includes('Job')) { badgeBg = 'rgba(2, 132, 199, 0.2)'; badgeColor = '#BAE6FD'; }
+    else if (type.includes('News')) { badgeBg = 'rgba(244, 63, 94, 0.2)'; badgeColor = '#FECDD3'; }
+    else if (type.includes('Code')) { badgeBg = 'rgba(219, 39, 119, 0.2)'; badgeColor = '#F472B6'; }
+
+    // Formulate a crisp description / info excerpt
+    let infoText = meta.description || meta.summary || '';
+    if (!infoText) {
+      if (type.includes('Paper')) {
+        infoText = meta.authors ? `Research paper contribution authored by ${meta.authors}.` : 'Groundbreaking research contribution.';
+      } else if (type.includes('Startup')) {
+        infoText = `${cleanName} is a high-growth AI organization specializing in ${meta.industry || 'Frontier AI'}.`;
+      } else if (type.includes('Product')) {
+        infoText = meta.creator ? `Flagship product created and deployed by ${meta.creator}.` : 'AI software solution.';
+      } else if (type.includes('Job')) {
+        infoText = `Active hiring role at ${meta.company || 'top AI company'} in ${meta.location || 'Remote'}.`;
+      } else if (type.includes('News')) {
+        infoText = `Real-time AI venture and intelligence news signal verified fresh within 24h.`;
+      }
+    }
+
+    // Build pills for metadata
+    let pillsHtml = '';
+    if (meta.stars) pillsHtml += `<span class="preview-meta-pill">⭐ <strong>${Number(meta.stars).toLocaleString()}</strong> stars</span>`;
+    if (meta.authors) pillsHtml += `<span class="preview-meta-pill">👥 <strong>${escapeHtml(meta.authors.slice(0, 24))}</strong></span>`;
+    if (meta.creator) pillsHtml += `<span class="preview-meta-pill">🏢 <strong>${escapeHtml(meta.creator)}</strong></span>`;
+    if (meta.pricing) pillsHtml += `<span class="preview-meta-pill">💎 <strong>${escapeHtml(meta.pricing)}</strong></span>`;
+    if (meta.location) pillsHtml += `<span class="preview-meta-pill">📍 <strong>${escapeHtml(meta.location)}</strong></span>`;
+    if (meta.company) pillsHtml += `<span class="preview-meta-pill">🏢 <strong>${escapeHtml(meta.company)}</strong></span>`;
+    if (meta.date) pillsHtml += `<span class="preview-meta-pill">🕒 <strong>${escapeHtml(meta.date.slice(0, 10))}</strong></span>`;
+
+    previewCard.innerHTML = `
+      <div class="preview-card-header">
+        <span class="preview-type-badge" style="background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeColor}44;">${escapeHtml(type.toUpperCase())}</span>
+        <span style="font-size: 0.72rem; color: #64748B;">Node Dialog</span>
+      </div>
+      <div class="preview-card-title">${escapeHtml(cleanName)}</div>
+      ${infoText ? `<div class="preview-card-desc">${escapeHtml(infoText.slice(0, 150))}</div>` : ''}
+      ${pillsHtml ? `<div class="preview-card-meta">${pillsHtml}</div>` : ''}
+      <div class="preview-card-footer">
+        <span>🖱️ Click to inspect</span>
+        <span style="color: #94A3B8;">Double-click to open ↗</span>
+      </div>
+    `;
+
+    updateDialogPosition(nodeId);
+    previewCard.style.display = 'block';
+    previewCard.classList.add('visible');
+  }
+
+  function hideNodeDialog() {
+    if (hideDialogTimer) clearTimeout(hideDialogTimer);
+    hideDialogTimer = setTimeout(() => {
+      activeHoverNodeId = null;
+      if (previewCard) {
+        previewCard.classList.remove('visible');
+      }
+      hideDialogTimer = null;
+    }, 120);
+  }
+
+  // Pin dialog position during physics simulation and view changes
+  graphNetwork.on('afterDrawing', function () {
+    if (activeHoverNodeId && previewCard && previewCard.classList.contains('visible')) {
+      updateDialogPosition(activeHoverNodeId);
+    }
+  });
+
+  graphNetwork.on('hoverNode', function (params) {
+    showNodeDialog(params.node);
+  });
+
+  graphNetwork.on('blurNode', function () {
+    hideNodeDialog();
+  });
+
+  // Direct canvas mousemove tracking with getNodeAt for instant 0ms response
+  container.addEventListener('mousemove', function (e) {
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const nodeId = graphNetwork.getNodeAt({ x, y });
+    if (nodeId) {
+      showNodeDialog(nodeId);
+    } else if (activeHoverNodeId) {
+      hideNodeDialog();
+    }
+  });
+
+  container.addEventListener('mouseleave', function () {
+    hideNodeDialog();
+  });
+
+  graphNetwork.on('dragging', function () {
+    hideNodeDialog();
+  });
+
+  graphNetwork.on('selectNode', function (params) {
+    if (params.nodes && params.nodes.length > 0) {
+      showNodeDialog(params.nodes[0]);
+    }
+  });
+
+  // Click on node: update inspector and redirect if configured
+  graphNetwork.on('click', function (params) {
+    if (params.nodes.length > 0) {
+      const nodeId = params.nodes[0];
+      showNodeDialog(nodeId);
+      const clickedNode = graphData.nodes.find(n => n.id === nodeId);
+      if (clickedNode) {
+        updateNodeInspector(clickedNode, graphData.startup);
+
+        // Track node interaction
+        if (window.trackActivity && clickedNode.meta) {
+          window.trackActivity({
+            type: 'graph',
+            title: `Explored Node: ${clickedNode.meta.name || clickedNode.meta.title || clickedNode.label}`,
+            subtitle: `Type: ${clickedNode.meta.type} · ${clickedNode.url ? 'Click to visit' : 'Metadata node'}`,
+            url: clickedNode.url || '#graph',
+            badge: (clickedNode.meta.type || 'NODE').toUpperCase().slice(0, 8),
+            meta: { node_id: nodeId }
+          });
+        }
+      }
+    }
+  });
+
+  // Double click: directly open node URL in new window
+  graphNetwork.on('doubleClick', function (params) {
+    if (params.nodes.length > 0) {
+      const nodeId = params.nodes[0];
+      const clickedNode = graphData.nodes.find(n => n.id === nodeId);
+      if (clickedNode && clickedNode.url && clickedNode.url !== '#' && !clickedNode.url.startsWith('/#')) {
+        window.open(clickedNode.url, '_blank');
+        showToast(`Redirecting to ${clickedNode.meta ? (clickedNode.meta.name || clickedNode.meta.title) : clickedNode.label}...`);
+      }
+    }
+  });
+}
+
+function updateNodeInspector(node, startup) {
+  if (!node) return;
+  const badgeEl = document.getElementById('node-inspector-badge');
+  const titleEl = document.getElementById('node-inspector-title');
+  const descEl = document.getElementById('node-inspector-desc');
+  const metaGrid = document.getElementById('node-inspector-meta');
+  const redirectBtn = document.getElementById('node-redirect-btn');
+
+  const meta = node.meta || {};
+  const type = meta.type || node.group || 'Entity';
+
+  if (badgeEl) {
+    badgeEl.textContent = type.toUpperCase();
+    badgeEl.style.background = node.color ? (node.color.background + '33') : 'rgba(99,102,241,0.2)';
+    badgeEl.style.color = node.color ? (node.color.border || '#A5B4FC') : '#A5B4FC';
+  }
+
+  const cleanName = meta.name || meta.title || node.label.replace(/^[^\w]+/, '');
+  if (titleEl) titleEl.textContent = cleanName;
+
+  let descText = meta.description || meta.summary || '';
+  if (!descText && type === 'Startup') descText = startup ? startup.description : '';
+  if (!descText && type === 'Research Paper') descText = `Research paper contribution by ${meta.authors || 'research authors'}.`;
+  if (!descText && type === 'Job Opening') descText = `Active hiring role at ${meta.company || (startup ? startup['content.entityName'] : 'organization')} (${meta.location || 'Remote'}).`;
+  if (!descText && type === 'News Signal') descText = `Real-time AI news signal verified fresh within 24 hours.`;
+  if (descEl) descEl.textContent = descText || 'Select or double-click to visit live source.';
+
+  // Build key-value rows
+  let rowsHtml = '';
+  if (type === 'Startup') {
+    rowsHtml += `
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Industry</span><span class="inspector-meta-val">${escapeHtml(meta.industry || 'AI')}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Location</span><span class="inspector-meta-val">${escapeHtml(meta.location || 'Global')}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Batch</span><span class="inspector-meta-val">${escapeHtml(meta.batch || 'Active')}</span></div>
+    `;
+  } else if (type === 'Product') {
+    rowsHtml += `
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Category</span><span class="inspector-meta-val">${escapeHtml(meta.category || 'AI Tool')}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Pricing</span><span class="inspector-meta-val">${escapeHtml(meta.pricing || 'Freemium')}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Creator</span><span class="inspector-meta-val">${escapeHtml(meta.creator || (startup ? startup['content.entityName'] : 'Verified'))}</span></div>
+    `;
+  } else if (type === 'Research Paper') {
+    rowsHtml += `
+      <div class="inspector-meta-row"><span class="inspector-meta-label">GitHub Stars</span><span class="inspector-meta-val">⭐ ${Number(meta.stars || 0).toLocaleString()}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Authors</span><span class="inspector-meta-val">${escapeHtml(meta.authors ? meta.authors.slice(0, 28) + '...' : 'Researchers')}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Source</span><span class="inspector-meta-val">arXiv / Papers with Code</span></div>
+    `;
+  } else if (type === 'Job Opening') {
+    rowsHtml += `
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Company</span><span class="inspector-meta-val">${escapeHtml(meta.company || (startup ? startup['content.entityName'] : 'Hiring Org'))}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Location</span><span class="inspector-meta-val">${escapeHtml(meta.location || 'Remote')}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Role Family</span><span class="inspector-meta-val">${escapeHtml(meta.role_family || 'Engineering')}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Freshness</span><span class="inspector-meta-val">&lt;24h Verified</span></div>
+    `;
+  } else if (type === 'News Signal') {
+    rowsHtml += `
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Published</span><span class="inspector-meta-val">${escapeHtml(meta.date || 'Recent')}</span></div>
+      <div class="inspector-meta-row"><span class="inspector-meta-label">Verification</span><span class="inspector-meta-val">ISO-8601 &lt;24h</span></div>
+    `;
+  }
+
+  if (metaGrid) metaGrid.innerHTML = rowsHtml;
+
+  // Set action redirect button
+  if (redirectBtn) {
+    const targetUrl = node.url || (startup ? startup['content.data.website'] : '#');
+    if (targetUrl && targetUrl !== '#' && !targetUrl.startsWith('/#')) {
+      redirectBtn.href = targetUrl;
+      redirectBtn.style.display = 'flex';
+      redirectBtn.innerHTML = `<span>Visit ${escapeHtml(cleanName.slice(0, 22))}</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
+    } else {
+      redirectBtn.style.display = 'none';
+    }
+  }
+}
+
+// Global hook to jump directly to graph tab with a selected entity in any category
+window.openEntityGraph = function(entityName, entityCategory = 'startups') {
+  if (!entityName) return;
+  const graphBtn = document.querySelector('.tab-btn[data-tab="graph"]');
+  if (graphBtn) graphBtn.click();
+  switchGraphCategory(entityCategory, entityName);
+};
+
+function initKnowledgeGraph() {
+  loadGraphEntitiesList(currentGraphCategory);
+  renderPresetChips(currentGraphCategory, currentGraphEntity);
+  loadEntityGraph(currentGraphEntity || 'OpenAI', currentGraphCategory);
+
+  // Category switching pills
+  document.querySelectorAll('.graph-cat-pill').forEach(pill => {
+    if (!pill.dataset.bound) {
+      pill.dataset.bound = 'true';
+      pill.addEventListener('click', () => {
+        const cat = pill.dataset.category;
+        if (cat && cat !== currentGraphCategory) {
+          switchGraphCategory(cat);
+        }
+      });
+    }
+  });
+
+  // Setup fit button
+  const fitBtn = document.getElementById('graph-fit-btn');
+  if (fitBtn && !fitBtn.dataset.bound) {
+    fitBtn.dataset.bound = 'true';
+    fitBtn.addEventListener('click', () => {
+      if (graphNetwork) graphNetwork.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+    });
+  }
+
+  // Setup load button & input
+  const loadBtn = document.getElementById('graph-load-btn');
+  const inputEl = document.getElementById('graph-entity-input');
+  if (loadBtn && !loadBtn.dataset.bound) {
+    loadBtn.dataset.bound = 'true';
+    loadBtn.addEventListener('click', () => {
+      if (inputEl) loadEntityGraph(inputEl.value.trim(), currentGraphCategory);
+    });
+  }
+  if (inputEl && !inputEl.dataset.bound) {
+    inputEl.dataset.bound = 'true';
+    inputEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter') loadEntityGraph(inputEl.value.trim(), currentGraphCategory);
+    });
+  }
 }
 
 function escapeHtml(str) {
@@ -980,4 +1497,5 @@ if (btnRunPipeline) {
 loadStats();
 setupSecondaryFilter();
 loadTabData();
+loadGraphEntitiesList();
 
