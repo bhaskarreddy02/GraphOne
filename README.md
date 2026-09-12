@@ -1,164 +1,262 @@
-# GraphOne / FrontierAtlas — Global AI Intelligence Graph Platform
+# GraphOne / FrontierAtlas 🌐
+### Global AI Intelligence Graph — Live Web Application
 
-A high-performance, fault-tolerant ingestion pipeline and intelligence graph platform engineering the premier global data intelligence graph for the artificial intelligence and venture capital ecosystem.
-
-The system facilitates continuous ingestion, normalization, multi-tier LLM extraction, deterministic entity resolution, and enrichment of multi-dimensional datasets across **startups, products, research papers (with live GitHub metrics), real-time AI news signals (<24h fresh), and AI job openings (<24h fresh)**.
-
----
-
-## Key Highlights & Architectural Strengths
-
-- **Zero-Hallucination Real-World Sourcing**: Every record is ground-truthed and acquired from verified live sources (ArXiv API, Papers with Code, Y Combinator Company Directory, Awesome AI Tools, TechCrunch, MIT Tech Review, RemoteOK, Remotive, WeWorkRemotely, Jobicy, HNRSS).
-- **Scalable to 500,000+ Records**: Distributed Kafka partition architecture, TLS impersonation (`curl_cffi`), dynamic proxy mesh, and asynchronous worker pools (`asyncio`).
-- **Resilient Multi-Tier LLM Orchestration**:
-  - Multi-tier fallback chain: **Gemini Flash (Tier 1)** $\rightarrow$ **Groq Llama 3 (Tier 2)** $\rightarrow$ **DeepSeek (Tier 3)** $\rightarrow$ **Local Deterministic Heuristic (Tier 4)**.
-  - **413 Payload Too Large Prevention**: Semantic text densifier and token budget governor that preserves critical context without triggering context overflows.
-  - **429 Rate Limit Handling**: Decorrelated full jitter exponential backoff ($\Delta t = \min(T_{\max}, \text{base} \times 2^{\text{attempt}}) \times \text{Uniform}(0.5, 1.5)$) prevents thundering herds.
-- **24-Hour Freshness Challenge Engine**: Normalizes ISO-8601, RFC 2822, and relative timestamps ("2 hours ago", "moments ago"), strictly verifying 24-hour freshness for real-time news and job signals.
-- **Deterministic Entity Resolution**: Legal suffix stripping (`Inc`, `LLC`, `Corp`, `Ltd`, `GmbH`, `Technologies`), spacing standardizer ("Open AI" $\rightarrow$ "OpenAI"), fuzzy matching (Jaro-Winkler / Token Set) calibrated against a 50-seed AI startup database, with complete audit logging.
-- **6-Tab Master Dataset**: Generates a unified Excel workbook (`data/output_intelligence_graph.xlsx`) ready for direct Google Sheets import, along with individual CSV exports.
-- **Production Design**: Includes [architecture.pdf](architecture.pdf) — a concise, maximum-3-page design document covering 500k scale, 413/429 handling, distributed deduplication (Bloom filters + SimHash), and polyglot storage (PostgreSQL + ClickHouse + Neo4j).
+> A real-time intelligence platform that crawls, extracts, resolves, and visualises the AI & venture ecosystem across **7,619 entities** — startups, products, research papers, jobs, and news signals — with an interactive knowledge graph and live entity resolver.
 
 ---
 
-## Directory Structure
+## What is GraphOne?
+
+GraphOne is a full-stack intelligence system built for the AI and venture capital ecosystem. It does four things end-to-end:
+
+1. **Crawls** — pulls live data from Y Combinator, ArXiv, Hugging Face, Papers With Code, GitHub, TechCrunch, Wired, MIT Tech Review, and 5 job boards.
+2. **Extracts** — uses a multi-tier LLM fallback chain (Gemini Flash → Groq Llama 3 → DeepSeek → Local Regex) to pull structured fields from raw HTML.
+3. **Resolves** — a deterministic entity resolver canonicalises names like `"Open AI, Inc."` → `"OpenAI"` using exact normalisation + RapidFuzz fuzzy matching, and logs every decision with confidence scores.
+4. **Serves** — an aiohttp web server exposes all data through 14 REST endpoints, powering a browser-based SPA with searchable tables, an interactive knowledge graph, and a live resolver playground.
+
+---
+
+## Live Features
+
+### 📊 Data Tables
+- **2,500 Startups** — canonical names, team sizes, industry categories, YC batch badges, website links, direct YC profile links
+- **2,500 AI Products** — parent startup, pricing tier (FREE / FREEMIUM / PAID / ENTERPRISE), category, source links
+- **2,500 Research Papers** — GitHub stars, HuggingFace upvotes, authors, source platform badges (ArXiv / HF / Papers With Code), PDF links
+- **73 AI Jobs** — 24h-fresh openings from 5 job boards, role family, company, location, remote status
+- **46 News Signals** — 24h-fresh headlines from TechCrunch, Wired, MIT Tech Review, Ars Technica, AI News
+- **5,073 Entity Audit Entries** — every resolution decision logged with raw name, canonical name, method, and confidence score
+
+Search, filter, sort, and paginate all 2,500 rows per vertical. Page size goes up to "Show All".
+
+### 🕸️ Interactive Knowledge Graph
+Select any entity — startup, product, paper, job, or news item — and instantly see its near-linkage graph:
+
+- The selected entity sits at the centre as an **oval node**
+- Connected nodes radiate out: 🚀 products, 📄 papers, 💼 job openings, 📰 news signals
+- **Hover** any node to see a glassmorphic popover with metadata
+- **Click** any node to open its live external URL
+- Edge labels show relationship type (`DEVELOPS`, `AUTHORED_BY`, `HIRING_TEAM`, `SIGNAL`, etc.)
+- Smooth spline edges, no arrows — clean organic graph layout
+
+### 🔍 Entity Resolver Playground
+Type any raw company name and see the resolver work live:
+- Exact match via normalised canonical map
+- Fuzzy match via RapidFuzz + Jaro-Winkler (threshold 0.70)
+- Returns `null` rather than guessing — never hallucinates
+- Every decision displayed: `{ raw_name, canonical_name, method, confidence }`
+
+### 📡 Continuous Monitoring Pipeline
+A persistent background pipeline runs 10 source crawlers (5 news + 5 job boards) on a continuous loop:
+- Items deduplicated by SHA-256 hash — never re-processes a seen URL
+- 24-hour freshness strictly enforced — stale items discarded, not stored
+- State persisted in SQLite — survives server restarts
+- Full run history visible in the Pipeline tab with per-source metrics
+
+### 📥 Downloads
+- **Download Excel** — `output_intelligence_graph.xlsx`, a 6-tab workbook (901 KB), correct MIME type, opens cleanly in Excel / Google Sheets
+- **Architecture PDF** — 3-page technical design document
+
+---
+
+## Architecture Overview
 
 ```
-GraphOne/
-├── architecture.pdf                 # Max 3-page production architecture document
-├── architecture.md                  # Markdown source of architecture design
-├── generate_architecture_pdf.py     # ReportLab script generating architecture.pdf
-├── requirements.txt                 # Project dependencies
-├── .env.example                     # Environment configuration template
-├── README.md                        # Documentation & setup guide
-├── data/                            # Pipeline outputs & exports
-│   ├── output_intelligence_graph.xlsx # Complete 6-Tab Workbook
-│   ├── startups.csv                 # 1,000+ Startups
-│   ├── products.csv                 # 1,000+ AI Products
-│   ├── research_papers.csv          # 1,000+ Papers with GitHub Stars
-│   ├── jobs.csv                     # 24-hr Fresh AI Jobs
-│   ├── news.csv                     # 24-hr Fresh AI News
-│   └── entity_mapping_log.csv       # Entity Resolution Audit Log
-├── src/
-│   ├── config.py                    # Environment, timeout, and concurrency limits
-│   ├── schemas/                     # Strict Pydantic models matching assessment schemas
-│   │   ├── startup.py               # StartupRecord
-│   │   ├── product.py               # ProductRecord
-│   │   ├── paper.py                 # ResearchPaperRecord
-│   │   ├── job.py                   # JobRecord
-│   │   ├── news.py                  # NewsRecord
-│   │   └── entity_mapping.py        # EntityMappingLogRecord
-│   ├── crawler/                     # Anti-bot async crawler mesh
-│   │   ├── base.py                  # Base crawler with retries, jitter, and headers
-│   │   ├── paper_crawler.py         # ArXiv & Papers with Code + GitHub stars
-│   │   ├── startup_crawler.py       # YC Directory 1,000+ startups scraper
-│   │   ├── product_crawler.py       # 1,000+ AI products scraper & pricing classifier
-│   │   ├── news_crawler.py          # 5 AI news feeds with 24h freshness verification
-│   │   ├── job_crawler.py           # 5 AI job boards with 24h freshness verification
-│   │   └── date_normalizer.py       # ISO-8601, RFC 2822, relative date engine
-│   ├── llm/                         # Multi-tier LLM engine
-│   │   ├── chunker.py               # Semantic densification (prevents 413)
-│   │   ├── backoff.py               # Decorrelated full jitter backoff (handles 429)
-│   │   ├── providers.py             # Gemini Flash, Groq Llama 3, DeepSeek, Local
-│   │   └── orchestrator.py          # Fallback chain orchestrator
-│   ├── entity_resolution/           # Deterministic entity resolution
-│   │   ├── seed_database.py         # 50 seed canonical AI startups
-│   │   ├── normalizer.py            # Legal suffix & punctuation normalizer
-│   │   └── resolver.py              # Fuzzy matching, confidence scoring, audit logger
-│   ├── pipeline/                    # Master execution engine
-│   │   └── runner.py                # Concurrent pipeline runner
-│   └── exporters/                   # Multi-format export engine
-│       └── excel_exporter.py        # Generates 6-tab Excel & CSV files
-└── tests/                           # Pytest automated test suite
-    ├── test_schemas.py              # Schema validation tests
-    ├── test_entity_resolver.py      # Entity resolution & canonicalization tests
-    ├── test_freshness.py            # 24-hour freshness boundary tests
-    └── test_llm_fallback.py         # 413 chunking & 429 backoff tests
+Data Sources          Ingestion Pipeline              Storage         Web App
+─────────────         ───────────────────             ───────         ───────
+YC Directory    ──►   5 Bulk Crawlers (async)   ──►
+ArXiv / HF / PWC      10 Signal Monitors (24h)       CSVs      ──►   aiohttp API
+GitHub API      ──►         ↓                         SQLite    ──►   14 endpoints
+TechCrunch etc        Deduplicator (SHA-256)          Excel     ──►   Browser SPA
+RemoteOK etc          LLM Chain (4-tier fallback)               ──►   vis.js Graph
+                      Entity Resolver (fuzzy)
 ```
+
+**LLM Fallback Chain** — Gemini Flash → Groq Llama 3 → DeepSeek → Local Regex. The last tier always succeeds, so data is never lost even if all cloud APIs are down.
+
+**Entity Resolver** — Three-step deterministic flow:
+1. Normalise (strip legal suffixes, punctuation, compound fusion)
+2. Exact lookup in canonical map
+3. RapidFuzz + JaroWinkler fuzzy match ≥ 0.70 threshold
+4. Return `null` — never guesses
 
 ---
 
-## Quickstart & Installation
+## Quickstart
 
-### 1. Prerequisites
-- Python 3.10+ (tested on Python 3.14)
-- Git
+### Prerequisites
+- Python 3.10+
 
-### 2. Setup Virtual Environment
+### 1. Clone & Install
 ```bash
-git clone https://github.com/your-username/GraphOne.git
+git clone https://github.com/bhaskarreddy02/GraphOne.git
 cd GraphOne
 python -m venv venv
-# On Windows:
-.\venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
-```
 
-### 3. Install Dependencies
-```bash
+# Windows
+.\venv\Scripts\activate
+
+# macOS / Linux
+source venv/bin/activate
+
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Variables (Optional)
-Copy the example environment file:
+### 2. (Optional) Set API Keys
 ```bash
 cp .env.example .env
 ```
-Populate API keys if you wish to use live cloud LLM providers:
 ```ini
-GEMINI_API_KEY=your_gemini_api_key
-GROQ_API_KEY=your_groq_api_key
-DEEPSEEK_API_KEY=your_deepseek_api_key
-GITHUB_TOKEN=your_github_token  # Optional, raises GitHub API rate limits
+GEMINI_API_KEY=your_key
+GROQ_API_KEY=your_key
+DEEPSEEK_API_KEY=your_key
+GITHUB_TOKEN=your_token   # raises GitHub rate limits for star scraping
 ```
-> **Note**: If API keys are not provided, the pipeline seamlessly operates using its built-in **Tier 4 Local Deterministic Parser** with zero downtime or external network failures.
+> Without any API keys, the system falls back to the local regex parser automatically. Everything still works.
 
----
+### 3. Start the Web Server
+```bash
+python -m src.server
+```
+Open **http://localhost:8000** in your browser.
 
-## Running the Pipeline
-
-### Execute Full End-to-End Extraction (1,000+ Records Across Verticals)
+### 4. (Optional) Re-run the Full Ingestion Pipeline
 ```bash
 python -m src.pipeline.runner
 ```
-
-This runs the concurrent crawlers, resolves entities against the 50-startup seed database, enforces 24-hour freshness verification, and outputs all results to:
-- `data/output_intelligence_graph.xlsx` (6 tabs)
-- `data/*.csv`
+This recrawls all sources, re-resolves entities, and regenerates all CSVs and the Excel workbook.
 
 ---
 
-## Running Automated Tests
+## Project Structure
 
-Run the full pytest suite:
-```bash
-pytest tests/ -v
+```
+GraphOne/
+├── Procfile                          # Railway / Render deployment config
+├── requirements.txt
+├── .env.example
+│
+├── data/
+│   ├── startups.csv                  # 2,500 records
+│   ├── products.csv                  # 2,500 records
+│   ├── research_papers.csv           # 2,500 records
+│   ├── jobs.csv                      # 73 fresh records
+│   ├── news.csv                      # 46 fresh records
+│   ├── entity_mapping_log.csv        # 5,073 resolution audit entries
+│   ├── output_intelligence_graph.xlsx # 6-tab Excel workbook (901 KB)
+│   └── pipeline_state.db             # SQLite monitoring state
+│
+├── public/
+│   ├── index.html                    # Main SPA shell
+│   ├── app.js                        # All frontend logic
+│   ├── style.css                     # Dark glassmorphic UI
+│   ├── activity.html                 # Recent visits tracker
+│   └── vis-network.min.js            # Graph visualisation (local asset)
+│
+└── src/
+    ├── server.py                     # aiohttp server, 14 REST endpoints
+    ├── config.py                     # Environment config
+    ├── schemas/                      # Pydantic models
+    │   ├── startup.py
+    │   ├── product.py
+    │   ├── paper.py
+    │   ├── job.py
+    │   ├── news.py
+    │   └── entity_mapping.py
+    ├── crawler/
+    │   ├── base.py                   # Async base with jitter backoff + UA rotation
+    │   ├── startup_crawler.py        # YC Directory
+    │   ├── product_crawler.py        # ProductHunt / GitHub
+    │   ├── paper_crawler.py          # ArXiv / HF / PWC + GitHub stars
+    │   ├── news_crawler.py           # 5 news sources
+    │   ├── job_crawler.py            # 5 job boards
+    │   ├── date_normalizer.py        # ISO-8601 / RFC 2822 / relative dates
+    │   └── modules/
+    │       ├── news/                 # TechCrunch, MIT, AINews, Wired, Ars
+    │       └── jobs/                 # RemoteOK, Remotive, WWR, Jobicy, HN Jobs
+    ├── llm/
+    │   ├── orchestrator.py           # 4-tier fallback chain
+    │   ├── providers.py              # Gemini / Groq / DeepSeek / Local
+    │   ├── chunker.py                # Semantic densifier (prevents 413 errors)
+    │   └── backoff.py                # Decorrelated jitter (handles 429 rate limits)
+    ├── entity_resolution/
+    │   ├── seed_database.py          # 50 canonical AI startup seeds + aliases
+    │   ├── normalizer.py             # Legal suffix stripper, compound fusion
+    │   └── resolver.py               # Exact + fuzzy resolver with full audit log
+    ├── pipeline/
+    │   ├── runner.py                 # Master pipeline orchestrator (Phases I–VI)
+    │   ├── monitor.py                # Continuous 24h monitoring pipeline
+    │   ├── deduplicator.py           # SHA-256 dedup + URL canonicalisation
+    │   ├── state_store.py            # SQLite persistent state
+    │   └── scheduler.py             # asyncio background scheduling
+    └── exporters/
+        └── excel_exporter.py         # 6-tab Excel + CSV export
 ```
 
 ---
 
-## Canonical Schemas Implemented
+## API Endpoints
 
-| Entity | Fields | Key Attributes |
-|---|---|---|
-| **Startup** | `schemaVersion`, `recordType="STARTUP"`, `source.name`, `source.url`, `content.entityName`, `content.data.employeeCount`, `collectedAt` | Authentic source URLs, canonical entity resolution |
-| **Product** | `schemaVersion`, `recordType="PRODUCT"`, `source.name`, `source.url`, `content.startupName`, `content.pricingModel` (`FREE`, `FREEMIUM`, `PAID`, `ENTERPRISE`), `collectedAt` | Normalized pricing tier, linked parent startup |
-| **Research Paper** | `schemaVersion`, `recordType="RESEARCH_PAPER"`, `content.title`, `content.authors`, `content.paper_url`, `content.github_url`, `content.github_stars`, `content.published_date` | Live dynamic GitHub star metrics |
-| **Job** | `schemaVersion`, `recordType="JOB"`, `source.name`, `content.company`, `content.date`, `content.is_remote`, `content.role_family` | Strictly $\le 24$ hours old, remote status |
-| **News** | `schemaVersion`, `recordType="NEWS"`, `source.name`, `content.title`, `content.published_date`, `content.summary`, `content.category` | Strictly $\le 24$ hours old, full-text content |
-| **Entity Mapping Log** | `raw_name`, `canonical_name`, `confidence_score`, `resolution_method`, `source_context`, `resolved_at` | Audit trail of legal suffix stripping & fuzzy matching |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/stats` | Platform-wide counts + confidence metrics |
+| GET | `/api/startups` | Startups with search, industry, team-size, sort filters |
+| GET | `/api/products` | Products with pricing tier filter |
+| GET | `/api/papers` | Papers with source + sort-by-stars/upvotes filters |
+| GET | `/api/jobs` | Jobs with role filter |
+| GET | `/api/news` | News with source filter |
+| GET | `/api/mappings` | Entity resolution audit log |
+| POST | `/api/resolve` | Live entity resolution — returns decision JSON |
+| GET | `/api/graph/entity` | vis.js node+edge payload for any entity |
+| GET | `/api/graph/entities` | Entity list for graph category dropdown |
+| GET | `/api/download/xlsx` | Download Excel workbook (correct MIME type) |
+| GET | `/api/download/pdf` | Download architecture PDF |
+| GET | `/api/pipeline/status` | All 10 crawler states |
+| POST | `/api/pipeline/run-now` | Trigger a monitoring cycle immediately |
 
 ---
 
-## Deliverables Summary
+## Deploying to the Web
 
-1. **Google Sheets / Excel Output**: `data/output_intelligence_graph.xlsx` containing all 6 required tabs:
-   - `Startups` (1,000+ rows)
-   - `Products` (1,000+ rows)
-   - `Research Papers` (1,000+ rows with GitHub stars)
-   - `Jobs` (24-hr fresh)
-   - `News` (24-hr fresh)
-   - `Entity Mapping Log` (Raw vs Canonical names)
-2. **Technical Architecture Document**: `architecture.pdf` (3 pages concise technical design document).
-3. **Engineering Source Code**: In `src/` with full asynchronous modular structure and test coverage.
+The app is ready to deploy on [Railway](https://railway.app) or [Render](https://render.com) — no Docker needed.
+
+**Railway (recommended):**
+1. Go to [railway.app](https://railway.app) → sign in with GitHub
+2. "Deploy from GitHub repo" → select `bhaskarreddy02/GraphOne`
+3. Railway auto-detects the `Procfile` and starts the server
+4. Settings → Networking → Generate Domain → share your link
+
+**Share instantly (local):**
+```bash
+winget install ngrok
+ngrok http 8000
+# Gets you a public https://xxxx.ngrok.io URL in seconds
+```
+
+---
+
+## Data Scale
+
+| Vertical | Records | Source |
+|----------|---------|--------|
+| Startups | 2,500 | Y Combinator Directory |
+| Products | 2,500 | ProductHunt / GitHub / Awesome Lists |
+| Research Papers | 2,500 | ArXiv · Hugging Face · Papers With Code |
+| Jobs | 73 (24h fresh) | RemoteOK · Remotive · WeWorkRemotely · Jobicy · HN |
+| News | 46 (24h fresh) | TechCrunch · Wired · MIT · Ars Technica · AI News |
+| Entity Audit Log | 5,073 | Auto-generated by resolver |
+| **Total** | **7,619** | |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python 3.10+ · aiohttp · asyncio |
+| Data | pandas · Pydantic v2 · openpyxl |
+| LLM | Gemini Flash · Groq Llama 3 · DeepSeek · Local Regex |
+| Entity Resolution | RapidFuzz · JaroWinkler |
+| Frontend | Vanilla JS · vis.js · CSS glassmorphism |
+| Storage | CSV · SQLite · Excel |
+| Fonts | Inter · JetBrains Mono (Google Fonts) |
+| Deployment | aiohttp server · Procfile · Railway / Render |
