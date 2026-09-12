@@ -50,3 +50,26 @@ async def test_orchestrator_fallback_to_heuristic():
     assert "Tier 4" in tier_name or "Local" in tier_name
     assert result.get("employeeCount") == 450
     assert result.get("pricingModel") == "FREEMIUM"
+
+
+def test_per_model_token_budget():
+    from src.llm.chunker import get_char_budget, truncate_semantically
+
+    # Gemini Flash budget should be large (128k context -> ~496k chars)
+    gemini_budget = get_char_budget("gemini-flash")
+    assert gemini_budget >= 100_000
+
+    # Groq LLaMA 3 budget should be tighter (~26k chars)
+    groq_budget = get_char_budget("groq-llama3")
+    assert groq_budget < 50_000
+
+    # DeepSeek budget (~248k chars)
+    deepseek_budget = get_char_budget("deepseek")
+    assert deepseek_budget > groq_budget
+
+    # Semantic truncation on sentence boundary
+    sample = "Autonomous agent reasoning. " * 2000
+    truncated = truncate_semantically(sample, "groq-llama3")
+    assert len(truncated) <= groq_budget
+    assert truncated.endswith(".")
+

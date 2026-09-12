@@ -4,20 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GraphOne / FrontierAtlas — Global AI Intelligence Graph</title>
+  <meta name="description" content="Real-time AI intelligence graph: 3,170+ entities across startups, products, research papers, jobs, and news with live entity resolution.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
+  <!-- Header -->
   <header class="app-header">
     <div class="brand">
       <div class="brand-icon">G1</div>
       <div>
         <div class="brand-title">
-          GraphOne Intelligence Graph
+          GraphOne
           <span class="brand-badge">FrontierAtlas</span>
         </div>
       </div>
@@ -25,83 +26,77 @@
 
     <div class="header-status">
       <span class="status-dot"></span>
-      <span>Continuous Ingestion Engine Active</span>
+      <span>Live</span>
     </div>
 
     <div class="header-actions">
       <a href="/api/download/pdf" class="btn btn-secondary" target="_blank">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
         Architecture PDF
       </a>
       <a href="/api/download/xlsx" class="btn btn-primary" download>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-        Download Master Excel (6 Tabs)
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Download Excel
       </a>
     </div>
   </header>
 
   <main class="container">
 
-    <!-- KPI Metric Cards -->
-    <section class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Total Ingested Entities</div>
-        <div class="kpi-value" id="kpi-total">3,170</div>
-        <div class="kpi-sub">Across 6 intelligence verticals</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-label">Startups Sourced</div>
-        <div class="kpi-value" id="kpi-startups">1,000</div>
-        <div class="kpi-sub">Verified Y Combinator Directory</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-label">AI Products & SaaS</div>
-        <div class="kpi-value" id="kpi-products">1,000</div>
-        <div class="kpi-sub">Classified pricing tiers</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-label">Research Papers</div>
-        <div class="kpi-value" id="kpi-papers">1,000</div>
-        <div class="kpi-sub">Live GitHub star tracking</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-label">24h Signal Freshness</div>
-        <div class="kpi-value" id="kpi-signals">170</div>
-        <div class="kpi-sub"><span class="badge-fresh">● 100% verified</span> &lt;24h news &amp; jobs</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-label">Entity Resolution</div>
-        <div class="kpi-value" id="kpi-accuracy">96.4%</div>
-        <div class="kpi-sub">2,115 canonical mappings</div>
-      </div>
+    <!-- Hero Metric -->
+    <section class="hero-metric">
+      <div class="hero-value" id="kpi-signals">170</div>
+      <div class="hero-label">24-hour signals ingested — news &amp; jobs verified fresh</div>
+      <div class="hero-sub" id="kpi-freshness-sub">100% verified &lt;24h</div>
     </section>
 
-    <!-- Interactive Entity Resolution Tester -->
+    <!-- Secondary Stats Strip -->
+    <div class="secondary-stats">
+      <div class="stat-item">
+        <span class="stat-value" id="kpi-total">3,170</span>
+        <span class="stat-label">Total Entities</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="kpi-startups">1,000</span>
+        <span class="stat-label">Startups</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="kpi-products">1,000</span>
+        <span class="stat-label">Products</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="kpi-papers">1,000</span>
+        <span class="stat-label">Papers</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="kpi-accuracy">96.4%</span>
+        <span class="stat-label">Entity Resolution</span>
+      </div>
+    </div>
+
+    <!-- Entity Resolution Playground -->
     <section class="playground-section">
       <div class="playground-header">
         <div class="section-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-          Live Deterministic Entity Resolution Playground
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          Entity Resolution Playground
         </div>
-        <span style="font-size: 0.78rem; color: var(--text-muted);">Try variations like: "OpenAI, Inc.", "Mistral AI SAS", "Cohere Technologies"</span>
+        <span style="font-size: 0.76rem; color: var(--text-muted);">Try: "OpenAI, Inc.", "Mistral AI SAS", "Cohere Technologies"</span>
       </div>
 
       <div class="playground-row">
-        <input type="text" id="er-input" class="input-field" placeholder="Enter messy or legal entity string (e.g. 'OpenAI, Inc.', 'Anthropic PBC', 'HuggingFace Inc.')..." value="OpenAI, Inc.">
-        <button id="er-btn" class="btn btn-primary">Resolve Entity</button>
+        <input type="text" id="er-input" class="input-field" placeholder="Enter entity string (e.g. 'OpenAI, Inc.', 'Anthropic PBC')..." value="OpenAI, Inc.">
+        <button id="er-btn" class="btn btn-primary">Resolve</button>
       </div>
 
       <div class="resolve-result" id="er-result">
         <div>
-          <span>Input: <strong id="res-raw">OpenAI, Inc.</strong> &nbsp;➔&nbsp; Resolved: <strong id="res-canonical" style="color: #60A5FA; font-size: 1rem;">OpenAI</strong></span>
+          <span style="color: var(--text-muted);">Input:</span> <strong id="res-raw" style="color: var(--text);">OpenAI, Inc.</strong>
+          <span style="color: var(--text-muted); margin: 0 6px;">→</span>
+          <strong id="res-canonical" style="color: var(--accent);">OpenAI</strong>
         </div>
         <div style="display: flex; gap: 10px; align-items: center;">
-          <span>Confidence: <strong id="res-conf" style="color: #34D399;">100%</strong></span>
+          <span style="color: var(--text-muted);">Confidence:</span> <strong id="res-conf" style="color: #5EEAD4;">100%</strong>
           <span class="badge badge-freemium" id="res-method">LEGAL_SUFFIX_STRIP</span>
         </div>
       </div>
@@ -110,44 +105,61 @@
     <!-- Navigation Tabs -->
     <div class="tabs-bar">
       <button class="tab-btn active" data-tab="startups">
-        🚀 Startups <span class="tab-count" id="count-startups">1,000</span>
+        Startups <span class="tab-count" id="count-startups">1,000</span>
       </button>
       <button class="tab-btn" data-tab="products">
-        ⚡ Products <span class="tab-count" id="count-products">1,000</span>
+        Products <span class="tab-count" id="count-products">1,000</span>
       </button>
       <button class="tab-btn" data-tab="papers">
-        📜 Research Papers <span class="tab-count" id="count-papers">1,000</span>
+        Papers <span class="tab-count" id="count-papers">1,000</span>
       </button>
       <button class="tab-btn" data-tab="jobs">
-        💼 24h Fresh Jobs <span class="tab-count" id="count-jobs">115</span>
+        Jobs <span class="tab-count" id="count-jobs">115</span>
       </button>
       <button class="tab-btn" data-tab="news">
-        📰 24h Fresh News <span class="tab-count" id="count-news">55</span>
+        News <span class="tab-count" id="count-news">55</span>
       </button>
       <button class="tab-btn" data-tab="mappings">
-        🧬 Entity Audit Log <span class="tab-count" id="count-mappings">2,115</span>
+        Entity Audit <span class="tab-count" id="count-mappings">2,115</span>
+      </button>
+      <button class="tab-btn" data-tab="pipeline">
+        Pipeline <span class="tab-count" id="count-pipeline" style="background: rgba(94,234,212,0.1); color: #5EEAD4;">Active</span>
       </button>
       <button class="tab-btn" data-tab="graph">
-        🌐 Visual Knowledge Graph
+        Knowledge Graph
       </button>
       <button class="tab-btn" data-tab="architecture">
-        📑 Architecture &amp; Production Design
+        Architecture
       </button>
     </div>
+
 
     <!-- Controls Bar -->
     <div class="controls-bar" id="controls-bar">
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
         <input type="text" id="filter-search" class="search-input" placeholder="Search across current vertical...">
       </div>
 
-      <div style="display: flex; gap: 12px;">
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         <select id="filter-secondary" class="filter-select">
           <option value="ALL">All Categories</option>
         </select>
+        <select id="filter-team-size" class="filter-select" style="display: none;">
+          <option value="ALL">All Team Sizes</option>
+          <option value="1-5">1–5 Employees</option>
+          <option value="6-15">6–15 Employees</option>
+          <option value="16-50">16–50 Employees</option>
+          <option value="50+">50+ Employees</option>
+        </select>
+        <select id="filter-sort" class="filter-select" style="display: none;">
+          <option value="default">Sort: Default</option>
+        </select>
         <button id="refresh-btn" class="btn btn-secondary">
-          ⟳ Refresh
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+          Refresh
         </button>
       </div>
     </div>
@@ -160,65 +172,181 @@
             <tr id="table-head"></tr>
           </thead>
           <tbody id="table-body">
-            <tr><td colspan="6" style="text-align: center; padding: 40px;">Loading live records...</td></tr>
+            <tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">Loading records...</td></tr>
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination -->
+      <div class="pagination-bar" id="pagination-bar">
+        <div class="pagination-info" id="pagination-info">
+          Showing <strong id="page-start" style="color: var(--text);">1</strong>–<strong id="page-end" style="color: var(--text);">10</strong> of <strong id="page-total" style="color: var(--text);">1,000</strong>
+        </div>
+        
+        <div class="pagination-controls" id="pagination-controls">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="pagination-size">
+          <span style="font-size: 0.78rem; color: var(--text-muted);">Rows:</span>
+          <select id="page-size-select" class="filter-select" style="padding: 5px 10px; font-size: 0.8rem; width: auto;">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <!-- Knowledge Graph Canvas Container (hidden by default) -->
-    <div id="graph-container" style="display: none; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px;">
+    <!-- Pipeline Monitor -->
+    <div id="pipeline-container" class="panel-container" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <h2 class="panel-title">Continuous Monitoring Pipeline</h2>
+            <span class="badge badge-fresh" style="font-size: 0.72rem;">● Active</span>
+          </div>
+          <p class="panel-subtitle">
+            Persistent SQLite state tracking across 10 modular crawlers with deduplication and 24h freshness enforcement.
+          </p>
+        </div>
+        <button id="btn-run-pipeline-now" class="btn btn-primary" style="display: flex; align-items: center; gap: 6px;">
+          <span id="pipeline-btn-icon">▶</span> Run Cycle Now
+        </button>
+      </div>
+
+      <!-- Pipeline KPIs -->
+      <div class="panel-kpi-grid">
+        <div class="panel-kpi">
+          <div class="panel-kpi-label">Persistent Store</div>
+          <div class="panel-kpi-value" style="color: var(--accent);">SQLite WAL</div>
+          <div class="panel-kpi-sub">data/pipeline_state.db</div>
+        </div>
+        <div class="panel-kpi">
+          <div class="panel-kpi-label">Total Tracked Items</div>
+          <div class="panel-kpi-value" id="pl-total-seen" style="color: #5EEAD4;">273+</div>
+          <div class="panel-kpi-sub">Persisted seen hashes</div>
+        </div>
+        <div class="panel-kpi">
+          <div class="panel-kpi-label">Stale Discarded (&gt;24h)</div>
+          <div class="panel-kpi-value" id="pl-stale-discarded" style="color: #FBBF24;">296</div>
+          <div class="panel-kpi-sub">Marked seen, skipped</div>
+        </div>
+        <div class="panel-kpi">
+          <div class="panel-kpi-label">Passed 24h Freshness</div>
+          <div class="panel-kpi-value" id="pl-fresh-passed" style="color: #5EEAD4;">115+</div>
+          <div class="panel-kpi-sub">Multi-tier LLM extracted</div>
+        </div>
+        <div class="panel-kpi">
+          <div class="panel-kpi-label">Run Schedule</div>
+          <div class="panel-kpi-value" style="color: var(--accent);">Every 30 Min</div>
+          <div class="panel-kpi-sub">Daemon loop / API trigger</div>
+        </div>
+      </div>
+
+      <!-- Crawlers Table -->
+      <div style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-size: 0.95rem; font-weight: 600;">10 Modular Crawlers</h3>
+          <span style="font-size: 0.76rem; color: var(--text-muted);">5 News + 5 Job Boards · Isolated error boundaries</span>
+        </div>
+        <div class="table-container" style="max-height: 380px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Total Seen</th>
+                <th>Last Run (UTC)</th>
+                <th>Rate-Limit</th>
+              </tr>
+            </thead>
+            <tbody id="pl-sources-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Run Logs Table -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="font-size: 0.95rem; font-weight: 600;">Recent Run Logs</h3>
+          <span style="font-size: 0.76rem; color: var(--text-muted);">SQLite crawl_run_logs</span>
+        </div>
+        <div class="table-container" style="max-height: 280px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Run ID</th>
+                <th>Start</th>
+                <th>Duration</th>
+                <th>Sources</th>
+                <th>New</th>
+                <th>&lt;24h</th>
+                <th>Stale</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="pl-runs-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Knowledge Graph Canvas -->
+    <div id="graph-container" class="panel-container" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <div style="font-weight: 700; font-size: 1.05rem;">Multi-Dimensional Venture Intelligence Graph</div>
-        <div style="font-size: 0.8rem; color: var(--text-muted);">Interactive force layout: Startup ➔ Product ➔ Research Paper ➔ Signals</div>
+        <div style="font-weight: 600; font-size: 0.95rem;">Venture Intelligence Graph</div>
+        <div style="font-size: 0.76rem; color: var(--text-muted);">Startup → Product → Paper → Signals</div>
       </div>
       <canvas id="graph-canvas"></canvas>
     </div>
 
-    <!-- Architecture Document Viewer (hidden by default) -->
-    <div id="arch-container" style="display: none; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <!-- Architecture -->
+    <div id="arch-container" class="panel-container" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
         <div>
-          <h2 style="font-size: 1.3rem; font-weight: 800;">Production Architecture &amp; Scale Strategy</h2>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">Blueprint to scale from 1,000 to 500,000+ multi-dimensional records with zero manual intervention.</p>
+          <h2 class="panel-title">Production Architecture &amp; Scale Strategy</h2>
+          <p class="panel-subtitle">Blueprint to scale from 1,000 to 500,000+ records with zero manual intervention.</p>
         </div>
-        <a href="/api/download/pdf" class="btn btn-primary" target="_blank">Download architecture.pdf (3 Pages)</a>
+        <a href="/api/download/pdf" class="btn btn-primary" target="_blank">Download PDF</a>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
-          <h3 style="color: #60A5FA; font-size: 1rem; margin-bottom: 10px;">1. 500k+ Scale Strategy</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
-            • <b>Distributed Frontier Queue:</b> Apache Kafka partitioned by target domain hash (<code>hash(host) % N</code>) to isolate domain throttling.<br>
-            • <b>Anti-Bot Navigation:</b> TLS impersonation using <code>curl_cffi</code> (JA3/JA4 Chrome fingerprints) and residential proxy pool rotation to bypass Cloudflare Turnstile &amp; Datadome.<br>
-            • <b>SPA Engine:</b> Playwright Headless worker pool intercepting raw GraphQL/XHR JSON endpoints directly.
+      <div class="arch-grid">
+        <div class="arch-card">
+          <h3 style="color: var(--accent);">1. 500k+ Scale Strategy</h3>
+          <p>
+            <b>Distributed Frontier Queue:</b> Apache Kafka partitioned by domain hash to isolate throttling.<br>
+            <b>Anti-Bot Navigation:</b> TLS impersonation via <code>curl_cffi</code> with residential proxy rotation.<br>
+            <b>SPA Engine:</b> Playwright headless worker pool intercepting GraphQL/XHR endpoints.
           </p>
         </div>
 
-        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
-          <h3 style="color: #34D399; font-size: 1rem; margin-bottom: 10px;">2. Handling 413s &amp; 429s</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
-            • <b>HTTP 413 Mitigation:</b> Strips non-semantic DOM tags and enforces sliding token budgeting with sentence boundary lookback.<br>
-            • <b>HTTP 429 Mitigation:</b> Exponential backoff with Decorrelated Full Jitter (<code>delay = Uniform(0.5, 1.5) * min(30s, base * 2^attempt)</code>).<br>
-            • <b>Multi-Tier Cascade:</b> Gemini Flash ➔ Groq Llama 3 ➔ DeepSeek ➔ Local Regex Parser.
+        <div class="arch-card">
+          <h3 style="color: #5EEAD4;">2. Handling 413s &amp; 429s</h3>
+          <p>
+            <b>HTTP 413 Mitigation:</b> Strips non-semantic DOM tags with sliding token budgeting.<br>
+            <b>HTTP 429 Mitigation:</b> Exponential backoff with Decorrelated Full Jitter.<br>
+            <b>Multi-Tier Cascade:</b> Gemini Flash → Groq Llama 3 → DeepSeek → Local Regex.
           </p>
         </div>
 
-        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
-          <h3 style="color: #FBBF24; font-size: 1rem; margin-bottom: 10px;">3. Freshness &amp; Deduplication</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
-            • <b>Distributed Bloom Filter:</b> RedisBloom checks seen URLs in &lt;1ms with &lt;0.01% false positive rate across crawler nodes.<br>
-            • <b>SimHash Content Fingerprinting:</b> 64-bit MinHash detects syndicated cross-posts across different domains (Hamming Distance &le; 3).<br>
-            • <b>Strict 24h Verification:</b> Real-time date normalization engine filters out stale news and job records.
+        <div class="arch-card">
+          <h3 style="color: #FBBF24;">3. Freshness &amp; Deduplication</h3>
+          <p>
+            <b>Distributed Bloom Filter:</b> RedisBloom checks seen URLs in &lt;1ms with &lt;0.01% FP rate.<br>
+            <b>SimHash Fingerprinting:</b> 64-bit MinHash detects syndicated cross-posts (Hamming ≤ 3).<br>
+            <b>Strict 24h Verification:</b> Real-time date normalization filters stale records.
           </p>
         </div>
 
-        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
-          <h3 style="color: #C084FC; font-size: 1rem; margin-bottom: 10px;">4. Polyglot Storage Architecture</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
-            • <b>PostgreSQL 16:</b> ACID state of truth for canonical entities and resolution mappings.<br>
-            • <b>ClickHouse:</b> Ingests 250k+ signal rows/sec with 80% columnar compression for 24h news, jobs, and time-series star metrics.<br>
-            • <b>Neo4j Knowledge Graph:</b> Constant-time $O(1)$ relationship traversal across complex venture links (Startup ➔ Product ➔ Paper ➔ Repo).
+        <div class="arch-card">
+          <h3 style="color: #C084FC;">4. Polyglot Storage</h3>
+          <p>
+            <b>PostgreSQL 16:</b> ACID state of truth for canonical entities.<br>
+            <b>ClickHouse:</b> 250k+ signal rows/sec with 80% columnar compression.<br>
+            <b>Neo4j:</b> O(1) relationship traversal across venture links.
           </p>
         </div>
       </div>

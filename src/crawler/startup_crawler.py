@@ -38,12 +38,17 @@ class StartupCrawler(BaseCrawler):
             if not name:
                 continue
 
-            website = comp.get("website") or comp.get("url") or f"https://www.ycombinator.com/companies/{comp.get('slug', '')}"
-            yc_url = comp.get("url") or website
+            direct_website = comp.get("website") or ""
+            slug = comp.get("slug") or ""
+            yc_url = comp.get("url") or f"https://www.ycombinator.com/companies/{slug}"
             team_size = comp.get("teamSize")
             employee_count = int(team_size) if team_size is not None and str(team_size).isdigit() else None
             industry = ", ".join(comp.get("industries", [])) or ", ".join(comp.get("tags", []))
             description = comp.get("oneLiner") or comp.get("longDescription")
+            batch = comp.get("batch") or ""
+            locations = comp.get("locations") or []
+            location = ", ".join(locations) if isinstance(locations, list) else str(locations)
+            status = comp.get("status") or "Active"
 
             record = StartupRecord(
                 schemaVersion="1.0",
@@ -57,7 +62,11 @@ class StartupCrawler(BaseCrawler):
                     data=StartupContentData(
                         employeeCount=employee_count,
                         industry=industry,
-                        description=description
+                        description=description,
+                        website=direct_website,
+                        batch=batch,
+                        location=location,
+                        status=status,
                     )
                 )
             )

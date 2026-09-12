@@ -24,6 +24,10 @@ class StartupContentData(BaseModel):
     employeeCount: Optional[int] = Field(None, description="Number of employees if available")
     industry: Optional[str] = Field(None, description="Industry or tags")
     description: Optional[str] = Field(None, description="Brief description of the startup")
+    website: Optional[str] = Field(None, description="Direct URL to startup website")
+    batch: Optional[str] = Field(None, description="YC batch or accelerator cohort (e.g. W24)")
+    location: Optional[str] = Field(None, description="Headquarters location or remote status")
+    status: Optional[str] = Field("Active", description="Operational status: Active, Acquired, Inactive")
 
 
 class StartupContent(BaseModel):

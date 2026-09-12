@@ -60,9 +60,69 @@ async def handle_stats(request: web.Request) -> web.Response:
 
 async def handle_startups(request: web.Request) -> web.Response:
     query = request.query.get("search", "").lower()
-    items = store.startups
+    industry = request.query.get("industry", "").strip().lower()
+    team_size = request.query.get("team_size", "").strip()
+    sort_by = request.query.get("sort_by", "").strip().lower()
+
+    items = list(store.startups)
+
+    # 1. Industry Category Filter
+    if industry and industry != "all":
+        items = [s for s in items if industry in str(s.get("industry", "")).lower()]
+
+    # 2. Number of Employees / Team Size Filter
+    if team_size and team_size != "all":
+        def match_team_size(s, ts):
+            raw = s.get("content.data.employeeCount")
+            try:
+                emp = float(raw) if raw not in (None, "") else -1
+            except (ValueError, TypeError):
+                emp = -1
+
+            if ts == "1-5":
+                return 1 <= emp <= 5
+            elif ts == "6-15":
+                return 6 <= emp <= 15
+            elif ts == "16-50":
+                return 16 <= emp <= 50
+            elif ts == "50+":
+                return emp > 50
+            elif ts == "undisclosed":
+                return emp <= 0
+            return True
+
+        items = [s for s in items if match_team_size(s, team_size)]
+
+    # 3. Search query
     if query:
-        items = [s for s in items if query in str(s.get("content.entityName", "")).lower() or query in str(s.get("industry", "")).lower()]
+        items = [
+            s for s in items
+            if query in str(s.get("content.entityName", "")).lower()
+            or query in str(s.get("industry", "")).lower()
+            or query in str(s.get("description", "")).lower()
+            or query in str(s.get("content.data.location", "")).lower()
+        ]
+
+    # 4. Sorting
+    if sort_by == "team_desc":
+        def get_emp(s):
+            try:
+                val = s.get("content.data.employeeCount")
+                return float(val) if val not in (None, "") else -1
+            except (ValueError, TypeError):
+                return -1
+        items.sort(key=get_emp, reverse=True)
+    elif sort_by == "team_asc":
+        def get_emp(s):
+            try:
+                val = s.get("content.data.employeeCount")
+                return float(val) if val not in (None, "") else 999999
+            except (ValueError, TypeError):
+                return 999999
+        items.sort(key=get_emp)
+    elif sort_by == "name":
+        items.sort(key=lambda s: str(s.get("content.entityName", "")).lower())
+
     limit = int(request.query.get("limit", "1000"))
     return web.json_response({"total": len(items), "data": items[:limit]})
 
@@ -81,14 +141,62 @@ async def handle_products(request: web.Request) -> web.Response:
 
 async def handle_papers(request: web.Request) -> web.Response:
     query = request.query.get("search", "").lower()
-    has_github = request.query.get("has_github", "").lower() == "true"
-    items = store.papers
-    if has_github:
-        items = [p for p in items if p.get("content.github_url")]
+    has_code = request.query.get("has_code", "").lower()
+    source = request.query.get("source", "").strip()
+    sort_by = request.query.get("sort_by", "impact").lower()
+
+    items = list(store.papers)
+
+    # 1. Filter by code repository availability
+    if has_code == "true":
+        items = [p for p in items if str(p.get("content.github_url", "")).strip()]
+    elif has_code == "false":
+        items = [p for p in items if not str(p.get("content.github_url", "")).strip()]
+
+    # 2. Filter by source platform
+    if source and source.upper() != "ALL":
+        items = [p for p in items if source.lower() in str(p.get("content.source_platform", "")).lower()]
+
+    # 3. Search query
     if query:
-        items = [p for p in items if query in str(p.get("content.title", "")).lower() or query in str(p.get("content.authors", "")).lower()]
+        items = [
+            p for p in items
+            if query in str(p.get("content.title", "")).lower()
+            or query in str(p.get("content.authors", "")).lower()
+            or query in str(p.get("content.github_url", "")).lower()
+        ]
+
+    # 4. Sorting & Ranking
+    def get_num(val, default=0):
+        try:
+            return float(val) if val is not None and str(val).strip() != "" else default
+        except (ValueError, TypeError):
+            return default
+
+    if sort_by == "stars":
+        items.sort(key=lambda p: get_num(p.get("content.github_stars", 0)), reverse=True)
+    elif sort_by == "upvotes":
+        items.sort(key=lambda p: get_num(p.get("content.huggingface_upvotes", 0)), reverse=True)
+    elif sort_by == "date":
+        items.sort(key=lambda p: str(p.get("content.published_date", "")), reverse=True)
+    else:  # impact / default
+        items.sort(
+            key=lambda p: (
+                1 if str(p.get("content.github_url", "")).strip() else 0,
+                get_num(p.get("content.impact_score", 0)),
+                get_num(p.get("content.github_stars", 0)),
+                get_num(p.get("content.huggingface_upvotes", 0)),
+                str(p.get("content.published_date", ""))
+            ),
+            reverse=True
+        )
+
     limit = int(request.query.get("limit", "1000"))
-    return web.json_response({"total": len(items), "data": items[:limit]})
+    return web.json_response({
+        "total": len(items),
+        "total_with_code": sum(1 for p in store.papers if str(p.get("content.github_url", "")).strip()),
+        "data": items[:limit]
+    })
 
 
 async def handle_jobs(request: web.Request) -> web.Response:
@@ -152,6 +260,42 @@ async def handle_download_pdf(request: web.Request) -> web.FileResponse:
     return web.FileResponse(pdf_path, headers={"Content-Disposition": 'attachment; filename="GraphOne_Architecture.pdf"'})
 
 
+async def handle_pipeline_status(request: web.Request) -> web.Response:
+    """Returns persistent state of all sources and recent monitoring cycles."""
+    from src.pipeline.state_store import PipelineStateStore
+    state_store = PipelineStateStore()
+    sources = state_store.get_all_source_states()
+    recent_runs = state_store.get_recent_runs(limit=10)
+    return web.json_response({
+        "sources": sources,
+        "recent_runs": recent_runs,
+        "total_sources": len(sources)
+    })
+
+
+async def handle_pipeline_logs(request: web.Request) -> web.Response:
+    """Returns crawl run audit logs."""
+    from src.pipeline.state_store import PipelineStateStore
+    state_store = PipelineStateStore()
+    runs = state_store.get_recent_runs(limit=25)
+    return web.json_response({"runs": runs})
+
+
+async def handle_pipeline_run_now(request: web.Request) -> web.Response:
+    """Triggers an immediate cycle across all 10 sources."""
+    async def _run_cycle_bg():
+        from src.pipeline.monitor import ContinuousMonitoringPipeline
+        pipeline = ContinuousMonitoringPipeline()
+        await pipeline.run_cycle()
+        store.reload_data()
+
+    asyncio.create_task(_run_cycle_bg())
+    return web.json_response({
+        "status": "triggered",
+        "message": "Continuous monitoring cycle initiated across all 10 sources in background"
+    })
+
+
 async def handle_trigger_pipeline(request: web.Request) -> web.Response:
     """Triggers an async pipeline reload/run in background."""
     asyncio.create_task(_run_pipeline_background())
@@ -178,6 +322,12 @@ def create_app() -> web.Application:
     app.router.add_get("/api/download/xlsx", handle_download_excel)
     app.router.add_get("/api/download/pdf", handle_download_pdf)
     app.router.add_post("/api/trigger", handle_trigger_pipeline)
+
+    # Phase 2 Monitoring Pipeline routes
+    app.router.add_get("/api/pipeline/status", handle_pipeline_status)
+    app.router.add_get("/api/pipeline/logs", handle_pipeline_logs)
+    app.router.add_post("/api/pipeline/run-now", handle_pipeline_run_now)
+
 
     # Static assets
     PUBLIC_DIR.mkdir(exist_ok=True, parents=True)

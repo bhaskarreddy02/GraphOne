@@ -51,3 +51,19 @@ def test_resolver_audit_log():
     assert len(log) >= 2
     assert log[0].canonical_name == "OpenAI"
     assert log[0].source_context == "YC Directory"
+
+
+def test_resolver_typo_and_unseen_entities():
+    resolver = EntityResolver()
+
+    # 1. Typo with lowercase 'l' instead of 'I'
+    canonical, conf, method = resolver.resolve("OpenAl")
+    assert canonical == "OpenAI"
+    assert method == "FUZZY_TOKEN_SET"
+    assert conf >= 0.80
+
+    # 2. Unseen entity should not be force-matched
+    canonical, conf, method = resolver.resolve("Brand New Frontier Lab LLC")
+    assert canonical == "Brand New Frontier Lab"
+    assert method == "NEW_CANONICAL"
+

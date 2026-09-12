@@ -72,6 +72,33 @@ def test_paper_schema():
     assert len(record.content.authors) == 2
 
 
+def test_paper_schema_with_huggingface_and_ranking():
+    record = ResearchPaperRecord(
+        schemaVersion="1.0",
+        recordType="RESEARCH_PAPER",
+        content=PaperContent(
+            title="DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+            authors=["DeepSeek-AI", "Daya Guo", "Dejian Yang"],
+            paper_url="https://arxiv.org/abs/2501.12948",
+            pdf_url="https://arxiv.org/pdf/2501.12948.pdf",
+            github_url="https://github.com/deepseek-ai/DeepSeek-R1",
+            github_stars=75000,
+            huggingface_url="https://huggingface.co/papers/2501.12948",
+            huggingface_upvotes=850,
+            source_platform="Hugging Face Daily Papers",
+            has_code=True,
+            impact_score=96250.0,
+            rank=1,
+            published_date="2025-01-22T00:00:00Z",
+        )
+    )
+    assert record.content.source_platform == "Hugging Face Daily Papers"
+    assert record.content.huggingface_upvotes == 850
+    assert record.content.has_code is True
+    assert record.content.rank == 1
+    assert record.content.pdf_url.endswith(".pdf")
+
+
 def test_job_schema():
     record = JobRecord(
         schemaVersion="1.0",

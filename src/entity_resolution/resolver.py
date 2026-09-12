@@ -83,11 +83,14 @@ class EntityResolver:
                 best_score = ratio
                 best_match = canonical
 
-        if best_score >= 0.88 and best_match:
+        # 3. Fuzzy String Similarity (Adaptive threshold: 0.80 for short strings <= 6 chars, 0.88 otherwise)
+        min_threshold = 0.80 if len(norm_name) <= 6 else 0.88
+        if best_score >= min_threshold and best_match:
             method = "FUZZY_TOKEN_SET"
             confidence = round(best_score, 2)
             self._log(clean_raw, best_match, confidence, method, source_context)
             return best_match, confidence, method
+
 
         # 4. New Canonical Entity (Cleaned title-cased name)
         # Suffix-stripped and properly capitalized
