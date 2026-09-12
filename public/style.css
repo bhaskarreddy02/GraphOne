@@ -891,10 +891,438 @@ tr:hover td {
     align-items: flex-start;
     gap: 10px;
   }
+
+  .activity-split-container {
+    flex-direction: column;
+  }
+  .switching-bars-rail {
+    width: 100%;
+    position: static;
+  }
+  .switching-bars-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .switching-bar {
+    width: auto;
+    flex: 1 1 calc(50% - 4px);
+  }
 }
 
 @media (max-width: 480px) {
   .hero-metric .hero-value { font-size: 1.8rem; }
   .brand-title { font-size: 0.92rem; }
   .tab-btn { padding: 5px 8px; font-size: 0.74rem; }
+  .activity-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .activity-card-lead {
+    flex-direction: row;
+    width: auto;
+    gap: 8px;
+  }
+  .switching-bar {
+    flex: 1 1 100%;
+  }
+}
+
+/* ==========================================================================
+   Activity & Recent Visits Styling
+   ========================================================================== */
+
+.activity-btn {
+  position: relative;
+  gap: 6px;
+  padding: 6px 12px;
+}
+
+.activity-counter-pill {
+  background: var(--accent);
+  color: #FFF;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 1px 6px;
+  border-radius: 9999px;
+  line-height: 1.2;
+  min-width: 18px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-hero-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.activity-hero-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activity-hero-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.activity-hero-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.activity-stat-pills {
+  display: flex;
+  gap: 10px;
+}
+
+.activity-stat-pill {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 84px;
+}
+
+.activity-stat-num {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.activity-stat-txt {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.activity-search-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.activity-split-container {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.switching-bars-rail {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  position: sticky;
+  top: 70px;
+}
+
+.switching-section-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.switching-bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.switching-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--speed);
+  text-align: left;
+}
+
+.switching-bar:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.switching-bar.active {
+  background: var(--surface-2);
+  border-color: rgba(79, 140, 255, 0.35);
+  color: var(--text);
+}
+
+.switching-bar.active .switching-bar-label svg {
+  color: var(--accent);
+}
+
+.switching-bar-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.switching-bar-label svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.switching-bar-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1px 6px;
+  border-radius: 9999px;
+  color: var(--text-muted);
+}
+
+.switching-bar.active .switching-bar-count {
+  background: rgba(79, 140, 255, 0.18);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.activity-privacy-note {
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.recently-viewed-panel {
+  flex: 1;
+  min-width: 0;
+}
+
+.recently-viewed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  padding: 0 4px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recently-viewed-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.recently-viewed-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+.recently-viewed-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.recently-viewed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all var(--speed);
+}
+
+.activity-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--surface-2);
+}
+
+.activity-card-lead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.activity-icon-bubble {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.activity-time-stamp {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.activity-glyph {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.activity-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
+}
+
+.activity-card-title {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.activity-card-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.activity-card-url {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.activity-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.activity-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: all var(--speed);
+}
+
+.activity-action-btn:hover {
+  background: var(--accent);
+  color: #FFF;
+  border-color: var(--accent);
+}
+
+.activity-action-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--speed);
+}
+
+.activity-action-delete:hover {
+  background: rgba(248, 113, 113, 0.15);
+  color: #F87171;
+}
+
+.activity-empty-state {
+  background: var(--surface-1);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-empty-icon {
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.activity-empty-title {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.activity-empty-desc {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  max-width: 360px;
+  line-height: 1.4;
 }

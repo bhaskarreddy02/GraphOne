@@ -336,7 +336,11 @@ def create_app() -> web.Application:
     async def index_handler(request):
         return web.FileResponse(PUBLIC_DIR / "index.html")
 
+    async def activity_handler(request):
+        return web.FileResponse(PUBLIC_DIR / "activity.html")
+
     app.router.add_get("/", index_handler)
+    app.router.add_get("/activity", activity_handler)
     return app
 
 

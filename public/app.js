@@ -701,6 +701,18 @@ async function testEntityResolution() {
     resConf.textContent = Math.round(data.confidence_score * 100) + '%';
     resMethod.textContent = data.resolution_method;
     showToast(`Resolved "${data.raw_name}" ➔ "${data.canonical_name}"`);
+
+    // Record user activity
+    if (window.trackActivity) {
+      window.trackActivity({
+        type: 'search',
+        title: `Resolved: "${data.raw_name}"`,
+        subtitle: `Canonical: ${data.canonical_name} (${Math.round(data.confidence_score * 100)}% via ${data.resolution_method})`,
+        url: '#playground',
+        badge: 'ENTITY',
+        meta: { raw: data.raw_name, canonical: data.canonical_name }
+      });
+    }
   } catch (err) {
     showToast('Resolution error: ' + err.message);
   } finally {
@@ -722,8 +734,66 @@ searchInput.addEventListener('input', e => {
     searchQuery = e.target.value.trim();
     currentPage = 1;
     loadTabData();
+
+    // Track user search query
+    if (searchQuery.length >= 3 && window.trackActivity) {
+      window.trackActivity({
+        type: 'search',
+        title: `Search: "${searchQuery}"`,
+        subtitle: `Filter query across ${currentTab.toUpperCase()}`,
+        url: '#' + currentTab,
+        badge: 'SEARCH'
+      });
+    }
   }, 250);
 });
+
+// Track table link clicks as user visits
+if (tableBody) {
+  tableBody.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (link && window.trackActivity) {
+      const row = link.closest('tr');
+      const titleEl = row ? row.querySelector('strong') : null;
+      const title = titleEl ? titleEl.textContent.trim() : link.textContent.trim();
+      const url = link.getAttribute('href') || '';
+      const linkText = link.textContent.trim();
+
+      let subtitle = '';
+      if (currentTab === 'startups') {
+        const cells = row ? row.querySelectorAll('td') : [];
+        const ind = cells[3] ? cells[3].textContent.trim() : '';
+        subtitle = ind ? `${ind} · ${linkText}` : linkText;
+      } else if (currentTab === 'products') {
+        const cells = row ? row.querySelectorAll('td') : [];
+        const creator = cells[2] ? cells[2].textContent.trim() : '';
+        const tier = cells[3] ? cells[3].textContent.trim() : '';
+        subtitle = `${creator} ${tier ? '· ' + tier : ''}`;
+      } else if (currentTab === 'papers') {
+        const cells = row ? row.querySelectorAll('td') : [];
+        const authors = cells[2] ? cells[2].textContent.trim() : '';
+        subtitle = `${authors || 'Research Paper'} · ${linkText}`;
+      } else if (currentTab === 'jobs') {
+        const cells = row ? row.querySelectorAll('td') : [];
+        const comp = cells[2] ? cells[2].textContent.trim() : '';
+        subtitle = `${comp || 'Verified Role'} · Apply`;
+      } else if (currentTab === 'news') {
+        const cells = row ? row.querySelectorAll('td') : [];
+        const src = cells[2] ? cells[2].textContent.trim() : '';
+        subtitle = `${src || 'AI News Outlet'} · Read`;
+      }
+
+      window.trackActivity({
+        type: currentTab,
+        title: title,
+        subtitle: subtitle,
+        url: url,
+        badge: currentTab.toUpperCase(),
+        meta: { action: linkText }
+      });
+    }
+  });
+}
 
 filterSecondary.addEventListener('change', () => {
   currentPage = 1;

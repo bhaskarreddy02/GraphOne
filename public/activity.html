@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recent Visits &amp; Activity — GraphOne / FrontierAtlas</title>
+  <meta name="description" content="Chronological user activity and recent visits across startups, products, research papers, jobs, and news.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">G1</div>
+      <div>
+        <div class="brand-title">
+          GraphOne
+          <span class="brand-badge">Activity Log</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-status">
+      <span class="status-dot"></span>
+      <span>Tracking Active</span>
+    </div>
+
+    <div class="header-actions">
+      <a href="/" class="btn btn-secondary" title="Return to Main Intelligence Dashboard">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Dashboard
+      </a>
+      <button class="btn btn-secondary" id="btn-export-activity" title="Export activity history as JSON">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Export
+      </button>
+      <button class="btn btn-secondary" id="btn-clear-activity" title="Clear all recent visit logs" style="color: #F87171;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        Clear All
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Activity Page Header & Stats -->
+    <div class="activity-hero-strip">
+      <div>
+        <div class="activity-hero-title">
+          <svg class="activity-hero-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+            <path d="M12 7v5l4 2"></path>
+          </svg>
+          Recent Visits &amp; Activity
+        </div>
+        <div class="activity-hero-subtitle">Chronological record of visited startups, products, papers, jobs, news, and entity queries</div>
+      </div>
+
+      <!-- Quick Metrics Strip -->
+      <div class="activity-stat-pills">
+        <div class="activity-stat-pill">
+          <span class="activity-stat-num" id="stat-total-visits">0</span>
+          <span class="activity-stat-txt">Total Visits</span>
+        </div>
+        <div class="activity-stat-pill">
+          <span class="activity-stat-num" id="stat-today-visits">0</span>
+          <span class="activity-stat-txt">Today</span>
+        </div>
+        <div class="activity-stat-pill">
+          <span class="activity-stat-num" id="stat-top-category">All</span>
+          <span class="activity-stat-txt">Top Category</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Search & Filter Bar -->
+    <div class="activity-search-bar">
+      <div class="search-input-wrapper" style="flex: 1;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="activity-search-input" placeholder="Search recent visits by title, company, authors, or keyword..." autocomplete="off">
+      </div>
+      <button class="btn btn-secondary" id="activity-reset-filter" style="font-size: 0.78rem;">Reset Filters</button>
+    </div>
+
+    <!-- Side-by-Side Split View Container -->
+    <div class="activity-split-container">
+
+      <!-- Left Side: Switching Bars Rail -->
+      <aside class="switching-bars-rail">
+        <div class="switching-section-title">Filter by Category</div>
+        <div class="switching-bars-list" id="category-switching-bars">
+          <button class="switching-bar active" data-category="all">
+            <div class="switching-bar-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+              <span>All Visits</span>
+            </div>
+            <span class="switching-bar-count" id="count-all">0</span>
+          </button>
+
+          <button class="switching-bar" data-category="startups">
+            <div class="switching-bar-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+              <span>Startups</span>
+            </div>
+            <span class="switching-bar-count" id="count-startups">0</span>
+          </button>
+
+          <button class="switching-bar" data-category="products">
+            <div class="switching-bar-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              <span>Products</span>
+            </div>
+            <span class="switching-bar-count" id="count-products">0</span>
+          </button>
+
+          <button class="switching-bar" data-category="papers">
+            <div class="switching-bar-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              <span>Research Papers</span>
+            </div>
+            <span class="switching-bar-count" id="count-papers">0</span>
+          </button>
+
+          <button class="switching-bar" data-category="jobs">
+            <div class="switching-bar-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              <span>Jobs</span>
+            </div>
+            <span class="switching-bar-count" id="count-jobs">0</span>
+          </button>
+
+          <button class="switching-bar" data-category="news">
+            <div class="switching-bar-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+              <span>News</span>
+            </div>
+            <span class="switching-bar-count" id="count-news">0</span>
+          </button>
+
+          <button class="switching-bar" data-category="search">
+            <div class="switching-bar-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <span>Searches &amp; Entity Lookups</span>
+            </div>
+            <span class="switching-bar-count" id="count-search">0</span>
+          </button>
+        </div>
+
+        <div class="switching-section-title" style="margin-top: 24px;">Time Horizon</div>
+        <div class="switching-bars-list" id="time-switching-bars">
+          <button class="switching-bar active" data-time="all">
+            <span>All Time</span>
+          </button>
+          <button class="switching-bar" data-time="today">
+            <span>Today</span>
+          </button>
+          <button class="switching-bar" data-time="yesterday">
+            <span>Yesterday</span>
+          </button>
+          <button class="switching-bar" data-time="older">
+            <span>Older than 2 Days</span>
+          </button>
+        </div>
+
+        <div class="activity-privacy-note">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          Stored locally in your browser. Private &amp; zero-latency.
+        </div>
+      </aside>
+
+      <!-- Right Side: Recently Viewed Items Feed -->
+      <section class="recently-viewed-panel">
+        <div class="recently-viewed-header">
+          <div>
+            <span class="recently-viewed-title" id="active-category-title">All Recent Visits</span>
+            <span class="recently-viewed-badge" id="active-category-count">0 items</span>
+          </div>
+          <div class="recently-viewed-sub" id="active-filter-desc">Showing chronological timeline</div>
+        </div>
+
+        <!-- Feed List -->
+        <div class="recently-viewed-list" id="recently-viewed-list">
+          <!-- Populated by activity.js -->
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <div id="toast" class="toast">Notification</div>
+
+  <script src="/static/tracker.js"></script>
+  <script src="/static/activity.js"></script>
+</body>
+</html>
