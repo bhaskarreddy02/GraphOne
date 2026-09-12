@@ -1,4 +1,5 @@
 # GraphOne / FrontierAtlas 🌐
+live link:https://web-production-ff255.up.railway.app/
 ### Global AI Intelligence Graph — Live Web Application
 
 > A real-time intelligence platform that crawls, extracts, resolves, and visualises the AI & venture ecosystem across **7,619 entities** — startups, products, research papers, jobs, and news signals — with an interactive knowledge graph and live entity resolver.
