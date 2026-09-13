@@ -9,3 +9,5 @@ requests>=2.31.0
 pytest>=7.4.0
 pytest-asyncio>=0.23.0
 rapidfuzz>=3.0.0
+aiohttp-asgi>=0.3.0
+
