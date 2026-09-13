@@ -1,379 +1,198 @@
-﻿"""
-Vercel WSGI entry point for GraphOne.
-Standalone Flask app - imports ONLY pandas and flask (no src.* dependencies).
-"""
-import sys
-import json
-import os
+﻿import sys, json, csv, os
 from pathlib import Path
-from flask import Flask, request, Response, send_file
+from flask import Flask, request, Response
+
+app = Flask(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 
-app = Flask(__name__)
+def _j(data, status=200):
+    return Response(json.dumps(data, ensure_ascii=False, default=str),
+                    status=status, mimetype="application/json")
 
-# ---------------------------------------------------------------------------
-# Load CSVs once at cold-start
-# ---------------------------------------------------------------------------
 def _load(name):
     path = DATA_DIR / name
     if not path.exists():
         return []
+    rows = []
     try:
-        import pandas as pd
-        return pd.read_csv(path).fillna("").to_dict(orient="records")
+        with open(path, encoding="utf-8", errors="replace") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                rows.append({k: (v if v is not None else "") for k, v in row.items()})
     except Exception as e:
-        return []
+        pass
+    return rows
 
-_startups  = _load("startups.csv")
-_products  = _load("products.csv")
-_papers    = _load("research_papers.csv")
-_jobs      = _load("jobs.csv")
-_news      = _load("news.csv")
-_mappings  = _load("entity_mapping_log.csv")
+_S = _load("startups.csv")
+_P = _load("products.csv")
+_PA = _load("research_papers.csv")
+_J = _load("jobs.csv")
+_N = _load("news.csv")
+_M = _load("entity_mapping_log.csv")
 
-def _json(data, status=200):
-    return Response(
-        json.dumps(data, ensure_ascii=False, default=str),
-        status=status,
-        mimetype="application/json"
-    )
-
-def _num(val, default=0):
-    try:
-        return float(val) if val is not None and str(val).strip() != "" else default
-    except (ValueError, TypeError):
-        return default
-
+def _n(v, d=0):
+    try: return float(v) if v not in (None,"") else d
+    except: return d
 
 @app.route("/api/health")
 def health():
-    return _json({
-        "status": "ok",
-        "data_dir": str(DATA_DIR),
-        "data_dir_exists": DATA_DIR.exists(),
-        "records": {
-            "startups": len(_startups),
-            "products": len(_products),
-            "papers":   len(_papers),
-            "jobs":     len(_jobs),
-            "news":     len(_news),
-        }
-    })
-
+    return _j({"ok":True,"startups":len(_S),"products":len(_P),"papers":len(_PA),"jobs":len(_J),"news":len(_N),"data_dir":str(DATA_DIR),"exists":DATA_DIR.exists()})
 
 @app.route("/api/stats")
 def stats():
-    avg_conf = round(
-        sum(float(m.get("confidence_score", 0.9)) for m in _mappings) / max(1, len(_mappings)), 3
-    )
-    return _json({
-        "startups_count": len(_startups),
-        "products_count": len(_products),
-        "papers_count":   len(_papers),
-        "jobs_count":     len(_jobs),
-        "news_count":     len(_news),
-        "mappings_count": len(_mappings),
-        "total_records":  len(_startups)+len(_products)+len(_papers)+len(_jobs)+len(_news),
-        "avg_confidence": avg_conf,
-        "excel_available": (DATA_DIR / "output_intelligence_graph.xlsx").exists(),
-        "pdf_available":   (PROJECT_ROOT / "architecture.pdf").exists(),
-    })
-
+    avg = round(sum(_n(m.get("confidence_score"),0.9) for m in _M)/max(1,len(_M)),3)
+    return _j({"startups_count":len(_S),"products_count":len(_P),"papers_count":len(_PA),"jobs_count":len(_J),"news_count":len(_N),"mappings_count":len(_M),"total_records":len(_S)+len(_P)+len(_PA)+len(_J)+len(_N),"avg_confidence":avg,"excel_available":(DATA_DIR/"output_intelligence_graph.xlsx").exists(),"pdf_available":(PROJECT_ROOT/"architecture.pdf").exists()})
 
 @app.route("/api/startups")
 def startups():
-    query     = request.args.get("search", "").lower()
-    industry  = request.args.get("industry", "").strip().lower()
-    team_size = request.args.get("team_size", "").strip()
-    sort_by   = request.args.get("sort_by", "").strip().lower()
-    limit_p   = request.args.get("limit", "")
-    items = list(_startups)
-    if industry and industry != "all":
-        items = [s for s in items if industry in str(s.get("industry","")).lower()]
-    if team_size and team_size != "all":
-        def _ts(s, ts):
-            try: emp = float(s.get("content.data.employeeCount") or -1)
-            except: emp = -1
-            if ts=="1-5":   return 1<=emp<=5
-            if ts=="6-15":  return 6<=emp<=15
-            if ts=="16-50": return 16<=emp<=50
-            if ts=="50+":   return emp>50
-            if ts=="undisclosed": return emp<=0
+    q=request.args.get("search","").lower(); ind=request.args.get("industry","").strip().lower()
+    ts=request.args.get("team_size","").strip(); sb=request.args.get("sort_by","").strip().lower()
+    lim=request.args.get("limit",""); items=list(_S)
+    if ind and ind!="all": items=[s for s in items if ind in s.get("industry","").lower()]
+    if ts and ts!="all":
+        def _t(s):
+            try: e=float(s.get("content.data.employeeCount") or -1)
+            except: e=-1
+            if ts=="1-5": return 1<=e<=5
+            if ts=="6-15": return 6<=e<=15
+            if ts=="16-50": return 16<=e<=50
+            if ts=="50+": return e>50
+            if ts=="undisclosed": return e<=0
             return True
-        items = [s for s in items if _ts(s, team_size)]
-    if query:
-        items = [s for s in items if
-                 query in str(s.get("content.entityName","")).lower() or
-                 query in str(s.get("industry","")).lower() or
-                 query in str(s.get("description","")).lower() or
-                 query in str(s.get("content.data.location","")).lower()]
-    if sort_by == "team_desc":
-        items.sort(key=lambda s: _num(s.get("content.data.employeeCount"),-1), reverse=True)
-    elif sort_by == "team_asc":
-        items.sort(key=lambda s: _num(s.get("content.data.employeeCount"),999999))
-    elif sort_by == "name":
-        items.sort(key=lambda s: str(s.get("content.entityName","")).lower())
-    total = len(items)
-    if limit_p and limit_p.isdigit() and int(limit_p)>0:
-        items = items[:int(limit_p)]
-    return _json({"total": total, "data": items})
-
+        items=[s for s in items if _t(s)]
+    if q: items=[s for s in items if q in s.get("content.entityName","").lower() or q in s.get("industry","").lower() or q in s.get("description","").lower()]
+    if sb=="team_desc": items.sort(key=lambda s:_n(s.get("content.data.employeeCount"),-1),reverse=True)
+    elif sb=="team_asc": items.sort(key=lambda s:_n(s.get("content.data.employeeCount"),999999))
+    elif sb=="name": items.sort(key=lambda s:s.get("content.entityName","").lower())
+    total=len(items)
+    if lim and lim.isdigit() and int(lim)>0: items=items[:int(lim)]
+    return _j({"total":total,"data":items})
 
 @app.route("/api/products")
 def products():
-    query   = request.args.get("search","").lower()
-    pricing = request.args.get("pricing","").upper()
-    limit_p = request.args.get("limit","")
-    items = list(_products)
-    if pricing and pricing != "ALL":
-        items = [p for p in items if p.get("content.pricingModel")==pricing]
-    if query:
-        items = [p for p in items if
-                 query in str(p.get("product_name","")).lower() or
-                 query in str(p.get("content.startupName","")).lower()]
-    total = len(items)
-    if limit_p and limit_p.isdigit() and int(limit_p)>0:
-        items = items[:int(limit_p)]
-    return _json({"total": total, "data": items})
-
+    q=request.args.get("search","").lower(); pr=request.args.get("pricing","").upper()
+    lim=request.args.get("limit",""); items=list(_P)
+    if pr and pr!="ALL": items=[p for p in items if p.get("content.pricingModel","")==pr]
+    if q: items=[p for p in items if q in p.get("product_name","").lower() or q in p.get("content.startupName","").lower()]
+    total=len(items)
+    if lim and lim.isdigit() and int(lim)>0: items=items[:int(lim)]
+    return _j({"total":total,"data":items})
 
 @app.route("/api/papers")
 def papers():
-    query    = request.args.get("search","").lower()
-    has_code = request.args.get("has_code","").lower()
-    source   = request.args.get("source","").strip()
-    sort_by  = request.args.get("sort_by","impact").lower()
-    limit_p  = request.args.get("limit","")
-    items = list(_papers)
-    if has_code=="true":
-        items = [p for p in items if str(p.get("content.github_url","")).strip()]
-    elif has_code=="false":
-        items = [p for p in items if not str(p.get("content.github_url","")).strip()]
-    if source and source.upper()!="ALL":
-        items = [p for p in items if source.lower() in str(p.get("content.source_platform","")).lower()]
-    if query:
-        items = [p for p in items if
-                 query in str(p.get("content.title","")).lower() or
-                 query in str(p.get("content.authors","")).lower() or
-                 query in str(p.get("content.abstract","")).lower()]
-    if sort_by=="stars":
-        items.sort(key=lambda p: _num(p.get("content.github_stars",0)), reverse=True)
-    elif sort_by=="upvotes":
-        items.sort(key=lambda p: _num(p.get("content.huggingface_upvotes",0)), reverse=True)
-    elif sort_by=="date":
-        items.sort(key=lambda p: str(p.get("content.published_date","")), reverse=True)
-    else:
-        items.sort(key=lambda p: (
-            1 if str(p.get("content.github_url","")).strip() else 0,
-            _num(p.get("content.impact_score",0)),
-            _num(p.get("content.github_stars",0)),
-            _num(p.get("content.huggingface_upvotes",0)),
-            str(p.get("content.published_date",""))
-        ), reverse=True)
-    total = len(items)
-    total_code = sum(1 for p in _papers if str(p.get("content.github_url","")).strip())
-    if limit_p and limit_p.isdigit() and int(limit_p)>0:
-        items = items[:int(limit_p)]
-    return _json({"total": total, "total_with_code": total_code, "data": items})
-
+    q=request.args.get("search","").lower(); hc=request.args.get("has_code","").lower()
+    src=request.args.get("source","").strip(); sb=request.args.get("sort_by","impact").lower()
+    lim=request.args.get("limit",""); items=list(_PA)
+    if hc=="true": items=[p for p in items if p.get("content.github_url","").strip()]
+    elif hc=="false": items=[p for p in items if not p.get("content.github_url","").strip()]
+    if src and src.upper()!="ALL": items=[p for p in items if src.lower() in p.get("content.source_platform","").lower()]
+    if q: items=[p for p in items if q in p.get("content.title","").lower() or q in p.get("content.authors","").lower()]
+    if sb=="stars": items.sort(key=lambda p:_n(p.get("content.github_stars")),reverse=True)
+    elif sb=="upvotes": items.sort(key=lambda p:_n(p.get("content.huggingface_upvotes")),reverse=True)
+    elif sb=="date": items.sort(key=lambda p:p.get("content.published_date",""),reverse=True)
+    else: items.sort(key=lambda p:(_n(p.get("content.impact_score")),_n(p.get("content.github_stars"))),reverse=True)
+    total=len(items); twc=sum(1 for p in _PA if p.get("content.github_url","").strip())
+    if lim and lim.isdigit() and int(lim)>0: items=items[:int(lim)]
+    return _j({"total":total,"total_with_code":twc,"data":items})
 
 @app.route("/api/jobs")
 def jobs():
-    query = request.args.get("search","").lower()
-    role  = request.args.get("role","")
-    items = list(_jobs)
-    if role and role!="ALL":
-        items = [j for j in items if role.lower() in str(j.get("content.role_family","")).lower()]
-    if query:
-        items = [j for j in items if
-                 query in str(j.get("title","")).lower() or
-                 query in str(j.get("content.company","")).lower()]
-    return _json({"total": len(items), "data": items})
-
+    q=request.args.get("search","").lower(); role=request.args.get("role","")
+    items=list(_J)
+    if role and role!="ALL": items=[j for j in items if role.lower() in j.get("content.role_family","").lower()]
+    if q: items=[j for j in items if q in j.get("title","").lower() or q in j.get("content.company","").lower()]
+    return _j({"total":len(items),"data":items})
 
 @app.route("/api/news")
 def news():
-    query  = request.args.get("search","").lower()
-    source = request.args.get("source","")
-    items  = list(_news)
-    if source and source!="ALL":
-        items = [n for n in items if source.lower() in str(n.get("source.name","")).lower()]
-    if query:
-        items = [n for n in items if query in str(n.get("content.title","")).lower()]
-    return _json({"total": len(items), "data": items})
-
+    q=request.args.get("search","").lower(); src=request.args.get("source","")
+    items=list(_N)
+    if src and src!="ALL": items=[n for n in items if src.lower() in n.get("source.name","").lower()]
+    if q: items=[n for n in items if q in n.get("content.title","").lower()]
+    return _j({"total":len(items),"data":items})
 
 @app.route("/api/mappings")
 def mappings():
-    query   = request.args.get("search","").lower()
-    limit_p = request.args.get("limit","")
-    items   = list(_mappings)
-    if query:
-        items = [m for m in items if
-                 query in str(m.get("raw_name","")).lower() or
-                 query in str(m.get("canonical_name","")).lower()]
-    total = len(items)
-    if limit_p and limit_p.isdigit() and int(limit_p)>0:
-        items = items[:int(limit_p)]
-    return _json({"total": total, "data": items})
-
+    q=request.args.get("search","").lower(); lim=request.args.get("limit",""); items=list(_M)
+    if q: items=[m for m in items if q in m.get("raw_name","").lower() or q in m.get("canonical_name","").lower()]
+    total=len(items)
+    if lim and lim.isdigit() and int(lim)>0: items=items[:int(lim)]
+    return _j({"total":total,"data":items})
 
 @app.route("/api/resolve", methods=["POST"])
 def resolve():
     try:
-        body     = request.get_json(force=True) or {}
-        raw_name = (body.get("name") or "").strip()
-        if not raw_name:
-            return _json({"error": "Empty name provided"}, 400)
-        # Simple fuzzy match without importing src.entity_resolution
-        from rapidfuzz import process, fuzz
-        names = [str(s.get("content.entityName","")) for s in _startups if s.get("content.entityName")]
-        match = process.extractOne(raw_name, names, scorer=fuzz.token_sort_ratio)
-        if match and match[1] >= 80:
-            return _json({"raw_name": raw_name, "canonical_name": match[0],
-                          "confidence": round(match[1]/100, 3), "method": "fuzzy", "is_known": True})
-        return _json({"raw_name": raw_name, "canonical_name": raw_name,
-                      "confidence": 0.0, "method": "passthrough", "is_known": False})
+        body=request.get_json(force=True) or {}; raw=(body.get("name") or "").strip()
+        if not raw: return _j({"error":"Empty name"},400)
+        names=[s.get("content.entityName","") for s in _S if s.get("content.entityName")]
+        best=None; best_score=0
+        rl=raw.lower()
+        for n in names:
+            nl=n.lower()
+            if nl==rl: return _j({"raw_name":raw,"canonical_name":n,"confidence":1.0,"method":"exact","is_known":True})
+            common=sum(1 for c in rl if c in nl); score=common/max(len(rl),len(nl))
+            if score>best_score: best_score=score; best=n
+        if best and best_score>0.7: return _j({"raw_name":raw,"canonical_name":best,"confidence":round(best_score,3),"method":"fuzzy","is_known":True})
+        return _j({"raw_name":raw,"canonical_name":raw,"confidence":0.0,"method":"passthrough","is_known":False})
     except Exception as e:
-        return _json({"error": str(e)}, 500)
-
+        return _j({"error":str(e)},500)
 
 @app.route("/api/pipeline/status")
-def pipeline_status():
-    return _json({"sources": [], "recent_runs": [], "total_sources": 0,
-                  "note": "Pipeline monitoring runs locally only."})
-
+def pl_status(): return _j({"sources":[],"recent_runs":[],"total_sources":0})
 
 @app.route("/api/pipeline/logs")
-def pipeline_logs():
-    return _json({"runs": [], "note": "Pipeline logs available locally only."})
-
+def pl_logs(): return _j({"runs":[]})
 
 @app.route("/api/pipeline/run-now", methods=["POST"])
-def pipeline_run_now():
-    return _json({"status": "acknowledged",
-                  "message": "Pipeline triggers not supported in serverless mode."})
-
+def pl_run(): return _j({"status":"serverless-only"})
 
 @app.route("/api/trigger", methods=["POST"])
-def trigger():
-    return _json({"status": "acknowledged",
-                  "message": "Pipeline triggers run locally only."})
-
-
-@app.route("/api/download/xlsx")
-def download_xlsx():
-    path = DATA_DIR / "output_intelligence_graph.xlsx"
-    if not path.exists():
-        return _json({"error": "Excel not available"}, 404)
-    return send_file(str(path), as_attachment=True,
-                     download_name="GraphOne_Intelligence.xlsx",
-                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
-
-@app.route("/api/download/pdf")
-def download_pdf():
-    path = PROJECT_ROOT / "architecture.pdf"
-    if not path.exists():
-        return _json({"error": "PDF not available"}, 404)
-    return send_file(str(path), as_attachment=True,
-                     download_name="GraphOne_Architecture.pdf",
-                     mimetype="application/pdf")
-
+def trigger(): return _j({"status":"serverless-only"})
 
 @app.route("/api/graph/entities")
 def graph_entities():
-    cat_type = request.args.get("type","startups").lower().strip()
-    result, seen = [], set()
-    if cat_type in ("product","products"):
-        for p in _products:
-            name = str(p.get("product_name","")).strip()
-            if name and name not in seen:
-                seen.add(name)
-                result.append({"name": name, "source": p.get("content.startupName") or "Product"})
-    elif cat_type in ("paper","papers","research_papers"):
-        for pa in _papers:
-            title = str(pa.get("content.title","")).strip()
-            if title and title not in seen:
-                seen.add(title)
-                result.append({"name": title, "source": f"{pa.get('content.github_stars',0)} Stars"})
-    elif cat_type in ("job","jobs"):
-        for j in _jobs:
-            title = str(j.get("title","")).strip()
-            if title and title not in seen:
-                seen.add(title)
-                result.append({"name": title, "source": j.get("content.company","Job")})
-    elif cat_type in ("news","news_signals"):
-        for n in _news:
-            title = str(n.get("content.title","")).strip()
-            if title and title not in seen:
-                seen.add(title)
-                result.append({"name": title, "source": n.get("source.name","News")})
+    cat=request.args.get("type","startups").lower(); result=[]; seen=set()
+    if cat in ("product","products"):
+        for p in _P:
+            n=p.get("product_name","").strip()
+            if n and n not in seen: seen.add(n); result.append({"name":n,"source":p.get("content.startupName","Product")})
+    elif cat in ("paper","papers"):
+        for p in _PA:
+            t=p.get("content.title","").strip()
+            if t and t not in seen: seen.add(t); result.append({"name":t,"source":f"{p.get('content.github_stars',0)} Stars"})
+    elif cat in ("job","jobs"):
+        for j in _J:
+            t=j.get("title","").strip()
+            if t and t not in seen: seen.add(t); result.append({"name":t,"source":j.get("content.company","Job")})
+    elif cat in ("news","news_signals"):
+        for n in _N:
+            t=n.get("content.title","").strip()
+            if t and t not in seen: seen.add(t); result.append({"name":t,"source":n.get("source.name","News")})
     else:
-        for s in _startups:
-            name = str(s.get("content.entityName","")).strip()
-            if name and name not in seen:
-                seen.add(name)
-                result.append({"name": name, "source": s.get("industry","Startup"), "is_seed": False})
-        result.sort(key=lambda x: x["name"])
-    return _json({"total": len(result), "entities": result[:300]})
-
+        for s in _S:
+            n=s.get("content.entityName","").strip()
+            if n and n not in seen: seen.add(n); result.append({"name":n,"source":s.get("industry","Startup"),"is_seed":False})
+        result.sort(key=lambda x:x["name"])
+    return _j({"total":len(result),"entities":result[:300]})
 
 @app.route("/api/graph/entity")
 def graph_entity():
-    raw_name    = request.args.get("name","").strip()
-    entity_type = request.args.get("type","startups").lower().strip()
-    if not raw_name:
-        return _json({"error": "name parameter required"}, 400)
-
-    # Find startup record
-    startup_data = next(
-        (s for s in _startups if str(s.get("content.entityName","")).lower()==raw_name.lower()), {}
-    )
-    if not startup_data:
-        startup_data = next(
-            (s for s in _startups if raw_name.lower() in str(s.get("content.entityName","")).lower()), {}
-        )
-
-    canonical   = str(startup_data.get("content.entityName", raw_name))
-    startup_url = str(startup_data.get("content.data.website") or startup_data.get("source.url") or "").strip()
-    sid         = "startup_center"
-    nodes = [{"id": sid, "label": canonical, "group": "startup", "title": "",
-               "url": startup_url or "/#startups", "value": 40, "shape": "ellipse",
-               "color": {"background":"#6366F1","border":"#A5B4FC"},
-               "font": {"color":"#FFFFFF","size":15,"face":"Inter"},
-               "meta": {"type":"Startup","name":canonical,"url":startup_url}}]
-    edges = []
-
-    for i, p in enumerate([p for p in _products
-                           if str(p.get("content.startupName","")).lower()==canonical.lower()][:4]):
-        pid = f"prod_{i}"
-        nodes.append({"id":pid,"label":str(p.get("product_name","")),"group":"product","title":"",
-                      "url":str(p.get("source.url") or startup_url),"value":22,"shape":"dot",
-                      "color":{"background":"#059669","border":"#34D399"},
-                      "font":{"color":"#ECFDF5","size":11},"meta":{"type":"Product"}})
-        edges.append({"from":sid,"to":pid,"label":"BUILDS","color":{"color":"#059669"},"length":150})
-
-    for i, j in enumerate([j for j in _jobs
-                           if canonical.lower() in str(j.get("content.company","")).lower()][:3]):
-        jid = f"job_{i}"
-        nodes.append({"id":jid,"label":str(j.get("title",""))[:24],"group":"job","title":"",
-                      "url":str(j.get("job_url") or startup_url),"value":18,"shape":"dot",
-                      "color":{"background":"#0284C7","border":"#7DD3FC"},
-                      "font":{"color":"#F0F9FF","size":11},"meta":{"type":"Job"}})
-        edges.append({"from":sid,"to":jid,"label":"HIRING","color":{"color":"#0284C7"},"length":170})
-
-    for i, n in enumerate([n for n in _news
-                           if canonical.lower() in str(n.get("content.title","")).lower()][:3]):
-        nid = f"news_{i}"
-        nodes.append({"id":nid,"label":str(n.get("content.title",""))[:25],"group":"news","title":"",
-                      "url":str(n.get("source.url") or startup_url),"value":18,"shape":"dot",
-                      "color":{"background":"#F43F5E","border":"#FECDD3"},
-                      "font":{"color":"#FFF1F2","size":11},"meta":{"type":"News"}})
-        edges.append({"from":sid,"to":nid,"label":"SIGNAL","color":{"color":"#F43F5E"},"length":200})
-
-    return _json({"canonical_name":canonical,"entity_type":entity_type,
-                  "startup":startup_data,"nodes":nodes,"edges":edges,
-                  "counts":{"total_nodes":len(nodes),"total_edges":len(edges)}})
+    raw=request.args.get("name","").strip(); etype=request.args.get("type","startups").lower()
+    if not raw: return _j({"error":"name required"},400)
+    sd=next((s for s in _S if s.get("content.entityName","").lower()==raw.lower()),{})
+    if not sd: sd=next((s for s in _S if raw.lower() in s.get("content.entityName","").lower()),{})
+    canon=sd.get("content.entityName",raw); url=sd.get("content.data.website","") or sd.get("source.url","")
+    nodes=[{"id":"c","label":canon,"group":"startup","title":"","url":url or "#","value":40,"shape":"ellipse","color":{"background":"#6366F1","border":"#A5B4FC"},"font":{"color":"#fff","size":15},"meta":{"type":"Startup","name":canon}}]
+    edges=[]
+    for i,p in enumerate([p for p in _P if p.get("content.startupName","").lower()==canon.lower()][:4]):
+        nodes.append({"id":f"p{i}","label":p.get("product_name",""),"group":"product","title":"","url":p.get("source.url","") or url,"value":22,"shape":"dot","color":{"background":"#059669","border":"#34D399"},"font":{"color":"#ECFDF5","size":11},"meta":{"type":"Product"}})
+        edges.append({"from":"c","to":f"p{i}","label":"BUILDS","color":{"color":"#059669"},"length":150})
+    for i,j in enumerate([j for j in _J if canon.lower() in j.get("content.company","").lower()][:3]):
+        nodes.append({"id":f"j{i}","label":j.get("title","")[:24],"group":"job","title":"","url":j.get("job_url","") or url,"value":18,"shape":"dot","color":{"background":"#0284C7","border":"#7DD3FC"},"font":{"color":"#F0F9FF","size":11},"meta":{"type":"Job"}})
+        edges.append({"from":"c","to":f"j{i}","label":"HIRING","color":{"color":"#0284C7"},"length":170})
+    for i,n in enumerate([n for n in _N if canon.lower() in n.get("content.title","").lower()][:3]):
+        nodes.append({"id":f"n{i}","label":n.get("content.title","")[:25],"group":"news","title":"","url":n.get("source.url","") or url,"value":18,"shape":"dot","color":{"background":"#F43F5E","border":"#FECDD3"},"font":{"color":"#FFF1F2","size":11},"meta":{"type":"News"}})
+        edges.append({"from":"c","to":f"n{i}","label":"SIGNAL","color":{"color":"#F43F5E"},"length":200})
+    return _j({"canonical_name":canon,"entity_type":etype,"startup":sd,"nodes":nodes,"edges":edges,"counts":{"total_nodes":len(nodes),"total_edges":len(edges)}})
