@@ -5,8 +5,14 @@
     { "src": "public/**", "use": "@vercel/static" }
   ],
   "routes": [
+    { "src": "/api/health", "dest": "/api/index.py" },
     { "src": "/api/(.*)", "dest": "/api/index.py" },
-    { "src": "/(.*\\.(js|css|html|ico|png|svg|woff2|woff|ttf|eot))", "dest": "/public/$1" },
+    { "src": "/style.css", "dest": "/public/style.css" },
+    { "src": "/app.js", "dest": "/public/app.js" },
+    { "src": "/tracker.js", "dest": "/public/tracker.js" },
+    { "src": "/activity.js", "dest": "/public/activity.js" },
+    { "src": "/vis-network.min.js", "dest": "/public/vis-network.min.js" },
+    { "src": "/activity", "dest": "/public/activity.html" },
     { "src": "/(.*)", "dest": "/public/index.html" }
   ]
 }
